@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZatcaEGS", "ZatcaEGS\ZatcaEGS.csproj", "{D5E30317-7D2D-4A8D-B034-69E5F372A3B0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zatca.eInvoice", "Zatca.eInvoice\Zatca.eInvoice.csproj", "{44B73D33-028B-4F08-A8D4-23E7B4B731D0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ManagerFiles", "ManagerFiles", "{CE40F32F-3997-4F19-8A84-62B166CC57F5}"
+	ProjectSection(SolutionItems) = preProject
+		ManagerFiles\QrCodeCustomField.txt = ManagerFiles\QrCodeCustomField.txt
+		ManagerFiles\QrCodeFooter.txt = ManagerFiles\QrCodeFooter.txt
+		ManagerFiles\Zatca eInvoice.manager = ManagerFiles\Zatca eInvoice.manager
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomFieldAndFooterGenerator", "BusinessAutoSetup\CustomFieldAndFooterGenerator.csproj", "{033C80F3-BC1F-4AD4-A16A-5AC113956C8C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zatca.eInvoice.Test", "Zatca.eInvoice.Test\Zatca.eInvoice.Test.csproj", "{2D1BCAFB-BB8F-4D44-A8D5-0889153DC1E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D5E30317-7D2D-4A8D-B034-69E5F372A3B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5E30317-7D2D-4A8D-B034-69E5F372A3B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5E30317-7D2D-4A8D-B034-69E5F372A3B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5E30317-7D2D-4A8D-B034-69E5F372A3B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44B73D33-028B-4F08-A8D4-23E7B4B731D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44B73D33-028B-4F08-A8D4-23E7B4B731D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44B73D33-028B-4F08-A8D4-23E7B4B731D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44B73D33-028B-4F08-A8D4-23E7B4B731D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{033C80F3-BC1F-4AD4-A16A-5AC113956C8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{033C80F3-BC1F-4AD4-A16A-5AC113956C8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{033C80F3-BC1F-4AD4-A16A-5AC113956C8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{033C80F3-BC1F-4AD4-A16A-5AC113956C8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D1BCAFB-BB8F-4D44-A8D5-0889153DC1E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D1BCAFB-BB8F-4D44-A8D5-0889153DC1E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D1BCAFB-BB8F-4D44-A8D5-0889153DC1E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D1BCAFB-BB8F-4D44-A8D5-0889153DC1E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6AEE0058-7E48-431E-A604-E4135517713B}
+	EndGlobalSection
+EndGlobal
