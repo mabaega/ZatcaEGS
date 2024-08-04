@@ -10,4 +10,4 @@ Watch the demonstration of the project:
 
 Or click the image below to watch at a specific time:
 
-[![Watch the video](https://img.youtube.com/vi/2wVFRToLTO0/0.jpg)](https://youtu.be/2wVFRToLTO0?t=776)
+[![Watch the video](https://img.youtube.com/vi/2wVFRToLTO0/0.jpg)](https://youtu.be/2wVFRToLTO0?t=0)
