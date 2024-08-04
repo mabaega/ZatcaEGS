@@ -4,7 +4,7 @@
       "apipath": "/text-custom-field-form",
       "customFields": [
         {
-          "Description": "<div id=\"QrCodeTextarea\" style=\"display: none;\"><script>document.addEventListener('DOMContentLoaded',()=>{const labelText='QR Code';const QRCodeCustomFieldGuid='3c4c1fb3-3b0e-4f2e-9eeb-2d466c496e2f';const vModelForm=document.getElementById('v-model-form');if(vModelForm){const labels=vModelForm.querySelectorAll('label');labels.forEach(label=>{if(label.textContent.trim()===labelText){const formGroup=label.closest('.form-group');if(formGroup){const inputs=formGroup.querySelectorAll('textarea');inputs.forEach(input=>{input.readOnly=true});const updateButton=document.querySelector('button.btn.btn-success[onclick=\"ajaxPost(true)\"]');if(!updateButton){app.CustomFields2.Strings[QRCodeCustomFieldGuid]=null;inputs.forEach(input=>{input.value=null})}}}})}const selfDeletingContainer=document.getElementById('QrCodeTextarea');if(selfDeletingContainer){selfDeletingContainer.remove()}});</script>\n</div>",
+          "Description": "<div id=\"QrCodeTextarea\" style=\"display: none;\"><script>document.addEventListener('DOMContentLoaded',()=>{const labelText='Base64 QRCode';const QRCodeCustomFieldGuid='3c4c1fb3-3b0e-4f2e-9eeb-2d466c496e2f';const vModelForm=document.getElementById('v-model-form');if(vModelForm){const labels=vModelForm.querySelectorAll('label');labels.forEach(label=>{if(label.textContent.trim()===labelText){const formGroup=label.closest('.form-group');if(formGroup){const inputs=formGroup.querySelectorAll('textarea');inputs.forEach(input=>{input.readOnly=true});const updateButton=document.querySelector('button.btn.btn-success[onclick=\"ajaxPost(true)\"]');if(!updateButton){app.CustomFields2.Strings[QRCodeCustomFieldGuid]=null;inputs.forEach(input=>{input.value=null})}}}})}const selfDeletingContainer=document.getElementById('QrCodeTextarea');if(selfDeletingContainer){selfDeletingContainer.remove()}});</script>\n</div>",
           "DisplayOnView": false,
           "Inactive": false,
           "Key": "3c4c1fb3-3b0e-4f2e-9eeb-2d466c496e2f",
@@ -161,7 +161,3 @@
     }
   ]
 }
-
-//Endpoint : https://mybook.manager.io/api2
-//Secret : Cg1UZXN0QXV0b1NldHVwEhIJjRbIAj9gQUgRohiEh9VvpKkaEgkBiI5T2n7JThGkGdlupgvWhw==
-//https://cloud.manager.io/free-trial-setup?CLafAQ

@@ -1,14 +1,13 @@
 ﻿using System.Reflection;
-using System.Runtime.Versioning;
 using System.Text;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+//This code is used to add the required Custom Field to the Business Data Manager.
 class Program
 {
     static async Task Main()
     {
-        Console.WriteLine("======================== CUSTOM FIELD & FOOTER GENERATOR ========================");
+        Console.WriteLine("================================= CUSTOM FIELD & FOOTER GENERATOR ==================================");
         Console.WriteLine();
         Console.WriteLine("  This application is used to automatically add fields to your Business Data.");
         Console.WriteLine("  Please ensure you have backed up your business database.");
@@ -18,10 +17,11 @@ class Program
         Console.WriteLine();
         Console.WriteLine("=================================================================================");
 
-        string baseUrl = GetBaseUrlFromUserInput(); 
+        string baseUrl = GetBaseUrlFromUserInput();
         string apiKey = GetApiKeyFromUserInput();
 
-        string jsonFilePath = "CfAndFooterGenerator.jsondata.json";
+        string jsonFilePath = "CustomFieldAndFooterGenerator.jsondata.json";
+
         string jsonData;
         using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(jsonFilePath))
         {
@@ -43,9 +43,9 @@ class Program
                 if (item.ContainsKey("data"))
                 {
                     JObject dataObject = (JObject)item["data"];
-                    string jsonPayload = dataObject.ToString(Formatting.None);
+                    string jsonPayload = dataObject.ToString(Newtonsoft.Json.Formatting.None);
 
-                    // Kirim data ke API
+                    // Send data to API
                     await SendDataToApi(baseUrl, apiPath, jsonPayload, apiKey);
                 }
                 else if (item.ContainsKey("customFields"))
@@ -53,14 +53,14 @@ class Program
                     JArray customFieldsArray = (JArray)item["customFields"];
                     foreach (JObject customField in customFieldsArray)
                     {
-                        string jsonPayload = customField.ToString(Formatting.None);
-                        // Kirim data ke API
+                        string jsonPayload = customField.ToString(Newtonsoft.Json.Formatting.None);
+                        // Send data to API
                         await SendDataToApi(baseUrl, apiPath, jsonPayload, apiKey);
                     }
                 }
             }
 
-            Console.WriteLine("Data telah berhasil dikirim.");
+            Console.WriteLine("Data has been successfully sent.");
             Console.ReadLine();
         }
         catch (Exception ex)
@@ -83,14 +83,14 @@ class Program
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Data berhasil dikirim untuk API path: {apiPath}");
-                    Console.WriteLine(jsonPayload);
+                    Console.WriteLine($"Data sent successfully for API path: {apiPath}");
+                    //Console.WriteLine(jsonPayload);
                     Console.WriteLine(response.StatusCode);
                     Console.WriteLine();
                 }
                 else
                 {
-                    Console.WriteLine($"Gagal mengirim data untuk API path: {apiPath}. Status code: {response.StatusCode}");
+                    Console.WriteLine($"Failed to send data for API path: {apiPath}. Status code: {response.StatusCode}");
                 }
             }
         }
@@ -102,15 +102,16 @@ class Program
 
     static string GetBaseUrlFromUserInput()
     {
-        // Fungsi untuk mendapatkan base URL dari pengguna
-        Console.Write("  Api2 EndPoint : ");
+        // Function to get base URL from user
+        Console.WriteLine();
+        Console.Write("Api2 EndPoint : ");
         return Console.ReadLine();
     }
 
     static string GetApiKeyFromUserInput()
     {
-        // Fungsi untuk mendapatkan X-API-KEY dari pengguna
-        Console.Write("  Api2 Secret : ");
+        // Function to get X-API-KEY from user
+        Console.Write("Api2 Secret : ");
         return Console.ReadLine();
     }
 }

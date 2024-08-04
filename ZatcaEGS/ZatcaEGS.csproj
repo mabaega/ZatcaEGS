@@ -47,7 +47,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\ZatcaEGS\Zatca.eInvoice\Zatca.eInvoice.csproj" />
-		<ProjectReference Include="..\BusinessAutoSetup\CustomFieldAndFooterGenerator.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -40,8 +40,9 @@ namespace Zatca.eInvoice
                 if (applayXsl) { invoiceData = invoiceData.ApplyXSLT(SharedUtilities.ReadResource("ZatcaDataInvoice.xsl"), true); }
                 return invoiceData.ToFormattedXml();
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error Get CleanInvoice XML: {ex.Message}");
                 return null;
             }
         }
@@ -108,9 +109,9 @@ namespace Zatca.eInvoice
                 XmlFileName = $"{SellerIdentification}_{IssueDate}{IssueTime}_{InvoiceNumber}.xml";
 
             }
-            catch (CryptographicException ex)
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error parsing certificate: {ex.Message}");
+                Console.WriteLine($"Error Get SignedInvoice XML: {ex.Message}");
                 throw;
             }
         }

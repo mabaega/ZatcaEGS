@@ -9,6 +9,7 @@ using Zatca.eInvoice.Helpers;
 using Zatca.eInvoice.Models;
 using Zatca.eInvoice.Test;
 
+//This code demonstrates how to use the Zatca.e Invoice Library.
 public class ZatcaService
 {
     private const string ComplianceCSIDUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/compliance";
@@ -553,9 +554,9 @@ class Program
 
                 Console.WriteLine("Signed Invoice Result:\n\n");
                 //Console.WriteLine($"Base64 Signed Invoice:\n{signedInvoiceResult.Base64SignedInvoice} \n");
-                //Console.WriteLine($"Base64 QR Code:\n{signedInvoiceResult.Base64QrCode} \n");
+                Console.WriteLine($"Base64 QR Code:\n{signedInvoiceResult.Base64QrCode} \n");
                 Console.WriteLine($"XML File Name:\n{signedInvoiceResult.XmlFileName} \n");
-                Console.WriteLine($"Request API:\n{signedInvoiceResult.RequestApi} \n");
+                //Console.WriteLine($"Request API:\n{signedInvoiceResult.RequestApi} \n");
 
 
                 // Step 3: Compliance Check
