@@ -1,0 +1,61 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Trigger this workflow on version tags, e.g., v1.2.3
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.x' # Ganti dengan versi .NET yang Anda gunakan
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build ZatcaEGS project
+      run: dotnet build ./ZatcaEGS/ZatcaEGS.csproj --configuration Release
+
+    - name: Publish ZatcaEGS project
+      run: dotnet publish ./ZatcaEGS/ZatcaEGS.csproj --configuration Release --output ./release/ZatcaEGS
+
+    - name: Build CustomFieldAndFooterGenerator project
+      run: dotnet build ./CustomFieldAndFooterGenerator/CustomFieldAndFooterGenerator.csproj --configuration Release
+
+    - name: Publish CustomFieldAndFooterGenerator project
+      run: dotnet publish ./CustomFieldAndFooterGenerator/CustomFieldAndFooterGenerator.csproj --configuration Release --output ./release/CustomFieldAndFooterGenerator
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        body: |
+          ## Changelog
+          * Automatically generated release
+
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./release/ZatcaEGS
+        asset_name: ZatcaEGS.zip
+        asset_content_type: application/zip
+
+    - name: Upload CustomFieldAndFooterGenerator asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./release/CustomFieldAndFooterGenerator
+        asset_name: CustomFieldAndFooterGenerator.zip
+        asset_content_type: application/zip
