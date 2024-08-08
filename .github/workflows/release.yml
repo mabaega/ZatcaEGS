@@ -19,13 +19,21 @@ jobs:
         dotnet-version: 8.x
 
     - name: Restore dependencies
-      run: dotnet restore ZatcaEGS/ZatcaEGS.csproj
+      run: dotnet restore ZatcaEGS/ZatcaEGS.csproj CFGenerator/CFGenerator.csproj
 
-    - name: Build the project
+    - name: Build ZatcaEGS project
       run: dotnet build ZatcaEGS/ZatcaEGS.csproj --configuration Release
 
-    - name: Publish the project
+    - name: Build CFGenerator project
+      run: dotnet build CFGenerator/CFGenerator.csproj --configuration Release
+
+    - name: Publish ZatcaEGS
       run: dotnet publish ZatcaEGS/ZatcaEGS.csproj --configuration Release --output publish
+
+    - name: Copy CFGenerator output to publish folder
+      run: |
+        cp CFGenerator/bin/Release/net8.0/win-x64/CFGenerator.exe publish/
+        cp CFGenerator/bin/Release/net8.0/win-x64/CFGenerator.dll publish/
 
     - name: Zip the publish folder
       run: zip -r ZatcaEGS.zip publish/*
