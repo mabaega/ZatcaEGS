@@ -28,16 +28,16 @@ jobs:
       run: dotnet publish ./ZatcaEGS/ZatcaEGS.csproj --configuration Release --output ./release/ZatcaEGS
 
     - name: Build CFGenerator project
-      run: dotnet build ./CFGenerator/CFGenerator.csproj --configuration Release
+      run: dotnet build ./BusinessAutoSetup/CFGenerator.csproj --configuration Release
 
     - name: Publish CFGenerator project
-      run: dotnet publish ./CFGenerator/CFGenerator.csproj --configuration Release --output ./release/CFGenerator
+      run: dotnet publish ./BusinessAutoSetup/CFGenerator.csproj --configuration Release --output ./release/CFGenerator
 
     - name: Package Files
       run: |
         mkdir -p ./release/ZatcaEGS
-        cp ./release/CFGenerator/CFGenerator.exe ./release/ZatcaEGS/
-        cp ./release/CFGenerator/CFGenerator.dll ./release/ZatcaEGS/
+        cp ./release/BusinessAutoSetup/CFGenerator.exe ./release/ZatcaEGS/
+        cp ./release/BusinessAutoSetup/CFGenerator.dll ./release/ZatcaEGS/
         cd ./release
         zip -r ZatcaEGS.zip ZatcaEGS
 
