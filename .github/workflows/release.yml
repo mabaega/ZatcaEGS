@@ -18,11 +18,25 @@ jobs:
       with:
         dotnet-version: 8.x
 
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
     - name: Restore dependencies for ZatcaEGS
       run: dotnet restore ZatcaEGS/ZatcaEGS.csproj
 
     - name: Restore dependencies for CFGenerator
       run: dotnet restore CFGenerator/CFGenerator.csproj
+
+    - name: Update ZatcaEGS version
+      run: |
+        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>${{ env.VERSION }}</AssemblyVersion>|g" ZatcaEGS/ZatcaEGS.csproj
+        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>${{ env.VERSION }}</FileVersion>|g" ZatcaEGS/ZatcaEGS.csproj
+
+    # - name: Update CFGenerator version
+    #   run: |
+    #     sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>${{ env.VERSION }}</AssemblyVersion>|g" CFGenerator/CFGenerator.csproj
+    #     sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>${{ env.VERSION }}</FileVersion>|g" CFGenerator/CFGenerator.csproj
 
     - name: Build ZatcaEGS project
       run: dotnet build ZatcaEGS/ZatcaEGS.csproj --configuration Release
@@ -39,11 +53,11 @@ jobs:
         cp CFGenerator/bin/Release/net8.0/win-x64/CFGenerator.dll publish/
 
     - name: Zip the publish folder
-      run: zip -r ZatcaEGS.zip publish/*
+      run: zip -r ZatcaEGS_${{ env.VERSION }}.zip publish/*
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ZatcaEGS.zip
+        files: ZatcaEGS_${{ env.VERSION }}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
