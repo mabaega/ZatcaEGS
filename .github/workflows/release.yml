@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*.*.*'  # Menjalankan workflow pada push tag yang sesuai dengan pola ini
 
 jobs:
   build:
