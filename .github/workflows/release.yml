@@ -1,0 +1,38 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # This will trigger the workflow on version tags like v1.0.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.x
+
+    - name: Restore dependencies
+      run: dotnet restore ZatcaEGS/ZatcaEGS.csproj
+
+    - name: Build the project
+      run: dotnet build ZatcaEGS/ZatcaEGS.csproj --configuration Release
+
+    - name: Publish the project
+      run: dotnet publish ZatcaEGS/ZatcaEGS.csproj --configuration Release --output publish
+
+    - name: Zip the publish folder
+      run: zip -r ZatcaEGS.zip publish/*
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ZatcaEGS.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
