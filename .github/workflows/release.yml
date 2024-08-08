@@ -18,8 +18,11 @@ jobs:
       with:
         dotnet-version: 8.x
 
-    - name: Restore dependencies
-      run: dotnet restore ZatcaEGS/ZatcaEGS.csproj CFGenerator/CFGenerator.csproj
+    - name: Restore dependencies for ZatcaEGS
+      run: dotnet restore ZatcaEGS/ZatcaEGS.csproj
+
+    - name: Restore dependencies for CFGenerator
+      run: dotnet restore CFGenerator/CFGenerator.csproj
 
     - name: Build ZatcaEGS project
       run: dotnet build ZatcaEGS/ZatcaEGS.csproj --configuration Release
