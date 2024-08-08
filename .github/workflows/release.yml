@@ -20,7 +20,7 @@ jobs:
 
     - name: Get version from tag
       id: get_version
-      run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" | sed 's/^v//' >> $GITHUB_ENV
 
     - name: Restore dependencies for ZatcaEGS
       run: dotnet restore ZatcaEGS/ZatcaEGS.csproj
@@ -30,13 +30,17 @@ jobs:
 
     - name: Update ZatcaEGS version
       run: |
-        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>${{ env.VERSION }}</AssemblyVersion>|g" ZatcaEGS/ZatcaEGS.csproj
-        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>${{ env.VERSION }}</FileVersion>|g" ZatcaEGS/ZatcaEGS.csproj
+        VERSION=${{ env.VERSION }}
+        MAJOR_MINOR_PATCH=$(echo $VERSION | awk -F. '{print $1 "." $2 "." $3}')
+        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$MAJOR_MINOR_PATCH.0</AssemblyVersion>|g" ZatcaEGS/ZatcaEGS.csproj
+        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$MAJOR_MINOR_PATCH.0</FileVersion>|g" ZatcaEGS/ZatcaEGS.csproj
 
     # - name: Update CFGenerator version
     #   run: |
-    #     sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>${{ env.VERSION }}</AssemblyVersion>|g" CFGenerator/CFGenerator.csproj
-    #     sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>${{ env.VERSION }}</FileVersion>|g" CFGenerator/CFGenerator.csproj
+    #     VERSION=${{ env.VERSION }}
+    #     MAJOR_MINOR_PATCH=$(echo $VERSION | awk -F. '{print $1 "." $2 "." $3}')
+    #     sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$MAJOR_MINOR_PATCH.0</AssemblyVersion>|g" CFGenerator/CFGenerator.csproj
+    #     sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$MAJOR_MINOR_PATCH.0</FileVersion>|g" CFGenerator/CFGenerator.csproj
 
     - name: Build ZatcaEGS project
       run: dotnet build ZatcaEGS/ZatcaEGS.csproj --configuration Release
