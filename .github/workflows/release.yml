@@ -3,7 +3,7 @@ name: Create Release
 on:
   push:
     tags:
-      - 'v*'  # This will trigger the workflow on version tags like v1.0.0
+      - 'v*'  # Ini akan memicu workflow pada tag dengan format v1.0.0
 
 jobs:
   build:
@@ -20,7 +20,10 @@ jobs:
 
     - name: Get version from tag
       id: get_version
-      run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" | sed 's/^v//' >> $GITHUB_ENV
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+    - name: Debug version variable
+      run: echo "VERSION=${{ env.VERSION }}"
 
     - name: Restore dependencies for ZatcaEGS
       run: dotnet restore ZatcaEGS/ZatcaEGS.csproj
@@ -32,15 +35,17 @@ jobs:
       run: |
         VERSION=${{ env.VERSION }}
         MAJOR_MINOR_PATCH=$(echo $VERSION | awk -F. '{print $1 "." $2 "." $3}')
+        echo "Updating to version: $MAJOR_MINOR_PATCH.0"
         sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$MAJOR_MINOR_PATCH.0</AssemblyVersion>|g" ZatcaEGS/ZatcaEGS.csproj
         sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$MAJOR_MINOR_PATCH.0</FileVersion>|g" ZatcaEGS/ZatcaEGS.csproj
 
-    # - name: Update CFGenerator version
-    #   run: |
-    #     VERSION=${{ env.VERSION }}
-    #     MAJOR_MINOR_PATCH=$(echo $VERSION | awk -F. '{print $1 "." $2 "." $3}')
-    #     sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$MAJOR_MINOR_PATCH.0</AssemblyVersion>|g" CFGenerator/CFGenerator.csproj
-    #     sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$MAJOR_MINOR_PATCH.0</FileVersion>|g" CFGenerator/CFGenerator.csproj
+    - name: Update CFGenerator version
+      run: |
+        VERSION=${{ env.VERSION }}
+        MAJOR_MINOR_PATCH=$(echo $VERSION | awk -F. '{print $1 "." $2 "." $3}')
+        echo "Updating to version: $MAJOR_MINOR_PATCH.0"
+        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$MAJOR_MINOR_PATCH.0</AssemblyVersion>|g" CFGenerator/CFGenerator.csproj
+        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$MAJOR_MINOR_PATCH.0</FileVersion>|g" CFGenerator/CFGenerator.csproj
 
     - name: Build ZatcaEGS project
       run: dotnet build ZatcaEGS/ZatcaEGS.csproj --configuration Release
