@@ -20,7 +20,7 @@ class Program
         string baseUrl = GetBaseUrlFromUserInput();
         string apiKey = GetApiKeyFromUserInput();
 
-        string jsonFilePath = "CustomFieldAndFooterGenerator.jsondata.json";
+        string jsonFilePath = "CFGenerator.jsondata.json";
 
         string jsonData;
         using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(jsonFilePath))
