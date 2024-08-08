@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*.*.*' # Trigger this workflow on version tags, e.g., v1.2.3
+      - 'v*.*.*'
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.x' # Versi .NET yang Anda gunakan
+        dotnet-version: '8.x'
 
     - name: Restore dependencies
       run: dotnet restore
