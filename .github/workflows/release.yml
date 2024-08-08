@@ -16,7 +16,7 @@ jobs:
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.x' # Ganti dengan versi .NET yang Anda gunakan
+        dotnet-version: '8.x' # Versi .NET yang Anda gunakan
 
     - name: Restore dependencies
       run: dotnet restore
@@ -33,6 +33,14 @@ jobs:
     - name: Publish CustomFieldAndFooterGenerator project
       run: dotnet publish ./CustomFieldAndFooterGenerator/CustomFieldAndFooterGenerator.csproj --configuration Release --output ./release/CustomFieldAndFooterGenerator
 
+    - name: Package Files
+      run: |
+        mkdir -p ./release/ZatcaEGS
+        cp ./release/CustomFieldAndFooterGenerator/CustomFieldAndFooterGenerator.exe ./release/ZatcaEGS/
+        cp ./release/CustomFieldAndFooterGenerator/CustomFieldAndFooterGenerator.dll ./release/ZatcaEGS/
+        cd ./release
+        zip -r ZatcaEGS.zip ZatcaEGS
+
     - name: Create Release
       uses: actions/create-release@v1
       env:
@@ -44,18 +52,10 @@ jobs:
           ## Changelog
           * Automatically generated release
 
-    - name: Upload release assets
+    - name: Upload release asset
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./release/ZatcaEGS
+        asset_path: ./release/ZatcaEGS.zip
         asset_name: ZatcaEGS.zip
-        asset_content_type: application/zip
-
-    - name: Upload CustomFieldAndFooterGenerator asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./release/CustomFieldAndFooterGenerator
-        asset_name: CustomFieldAndFooterGenerator.zip
         asset_content_type: application/zip
