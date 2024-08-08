@@ -23,37 +23,11 @@ namespace ZatcaEGS.Controllers
             _deviceSetup = _dbContext.DeviceSetups.OrderBy(x => x.RowId).FirstOrDefault() ?? new DeviceSetup();
         }
 
-
-        [HttpPost("decodeqrcode")]
-        public ActionResult DecodeQrCode([FromBody] QrCodeRequest request)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(request.QrCodeContent))
-                {
-                    return Json(new { success = false, error = "QR Code content is empty" });
-                }
-                //Console.WriteLine(request.QrCodeContent);
-                string decodedContent = QrCodeDecoder.GetDecodedContentAsString(request.QrCodeContent);
-                return Json(new { success = true, content = decodedContent });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, error = ex.Message });
-            }
-        }
-
-        public class QrCodeRequest
-        {
-            public string QrCodeContent { get; set; }
-        }
-
         [HttpPost("processform")]
         public IActionResult ProcessFormData([FromForm] Dictionary<string, string> formData)
         {
             try
             {
-                //_logger.LogInformation("Received form data: {FormData}", JsonConvert.SerializeObject(formData));
 
                 var relayData = new RelayData
                 {
@@ -79,7 +53,10 @@ namespace ZatcaEGS.Controllers
                     return View("Error", errorModel);
                 }
 
-                ApprovedInvoice approvedInvoice = _dbContext.ApprovedInvoices.FirstOrDefault(invoice => invoice.ManagerUUID == relayData.Key);
+                ApprovedInvoice approvedInvoice = _dbContext.ApprovedInvoices
+                                .FirstOrDefault(invoice => invoice.ManagerUUID == relayData.Key &&
+                                (invoice.ApprovalStatus == "CLEARED" || invoice.ApprovalStatus == "REPORTED"));
+
 
                 if (approvedInvoice != null)
                 {
@@ -90,7 +67,10 @@ namespace ZatcaEGS.Controllers
                 else
                 {
                     (int ICV, string PIH) = InvoiceHelper.GetLastICVandPIH(_dbContext);
-                    Invoice invoice = RelayToInvoiceMapper.GenerateInvoiceObject(relayData, _deviceSetup, ICV, PIH);
+                    
+                    string zatcaUUID = InvoiceHelper.GetZatcaUUID(_dbContext, relayData.Key);
+
+                    Invoice invoice = RelayToInvoiceMapper.GenerateInvoiceObject(relayData, _deviceSetup, zatcaUUID, ICV, PIH);
 
                     InvoiceGenerator ig = new(
                         invoice,
@@ -114,6 +94,7 @@ namespace ZatcaEGS.Controllers
 
                     approvedInvoice = new ApprovedInvoice
                     {
+                        ZatcaUUID = zatcaUUID,
                         ManagerUUID = relayData.Key,
                         InvoiceType = invoice.InvoiceTypeCode?.Value,
                         InvoiceSubType = invoice.InvoiceTypeCode?.Name,
@@ -134,7 +115,7 @@ namespace ZatcaEGS.Controllers
                         XmlFileName = XmlFileName,
                         Timestamp = DateTime.Now,
                         EditData = editData,
-                        CsrType = _deviceSetup.CsrType
+                        EnvironmentType = _deviceSetup.EnvironmentType
                     };
 
                     return View("Index", approvedInvoice);
@@ -158,7 +139,7 @@ namespace ZatcaEGS.Controllers
             {
                 ZatcaRequestApi zatcaRequestApi = new()
                 {
-                    Uuid = model.ManagerUUID,
+                    Uuid = model.ZatcaUUID,
                     InvoiceHash = model.InvoiceHash,
                     Invoice = model.Base64SignedInvoice
                 };
@@ -183,9 +164,10 @@ namespace ZatcaEGS.Controllers
 
                 model.RequestType = apiResponse.RequestType;
                 model.StatusCode = apiResponse.StatusCode;
-                model.ClearanceStatus = apiResponse.ClearanceStatus;
-                model.ReportingStatus = apiResponse.ReportingStatus;
-                model.CsrType = _deviceSetup.CsrType;
+
+                model.ApprovalStatus = string.IsNullOrEmpty(apiResponse.ClearanceStatus) ? apiResponse.ReportingStatus : apiResponse.ClearanceStatus;
+
+                model.EnvironmentType = _deviceSetup.EnvironmentType;
 
                 model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
@@ -203,7 +185,9 @@ namespace ZatcaEGS.Controllers
         {
             try
             {
-                ApprovedInvoice approvedInvoice = _dbContext.ApprovedInvoices.FirstOrDefault(invoice => invoice.ManagerUUID == model.ManagerUUID);
+                ApprovedInvoice approvedInvoice = _dbContext.ApprovedInvoices
+                                              .FirstOrDefault(invoice => invoice.ZatcaUUID == model.ZatcaUUID);
+
 
                 if (approvedInvoice != null)
                 {
@@ -216,7 +200,7 @@ namespace ZatcaEGS.Controllers
 
                 ZatcaRequestApi zatcaRequestApi = new()
                 {
-                    Uuid = model.ManagerUUID,
+                    Uuid = model.ZatcaUUID,
                     InvoiceHash = model.InvoiceHash,
                     Invoice = model.Base64SignedInvoice
                 };
@@ -261,13 +245,15 @@ namespace ZatcaEGS.Controllers
 
                 model.RequestType = apiResponse.RequestType;
                 model.StatusCode = apiResponse.StatusCode;
-                model.ClearanceStatus = apiResponse.ClearanceStatus;
-                model.ReportingStatus = apiResponse.ReportingStatus;
-                model.CsrType = _deviceSetup.CsrType;
+
+                model.ApprovalStatus = apiResponse.ClearanceStatus;
+
+                model.EnvironmentType = _deviceSetup.EnvironmentType;
 
                 model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
-                if (model.ClearanceStatus == "CLEARED")
+                //Also Save Rejected Invoice, Need New ICV and PIH to resend Corrected Documents
+                if (model.ApprovalStatus.Contains("CLEARED"))
                 {
                     model.Timestamp = DateTime.Now;
 
@@ -291,7 +277,10 @@ namespace ZatcaEGS.Controllers
             {
                 try
                 {
-                    ApprovedInvoice approvedInvoice = _dbContext.ApprovedInvoices.FirstOrDefault(invoice => invoice.ManagerUUID == model.ManagerUUID);
+                    
+                    ApprovedInvoice approvedInvoice = _dbContext.ApprovedInvoices
+                               .FirstOrDefault(invoice => invoice.ZatcaUUID == model.ZatcaUUID);
+
 
                     if (approvedInvoice != null)
                     {
@@ -304,7 +293,7 @@ namespace ZatcaEGS.Controllers
 
                     ZatcaRequestApi zatcaRequestApi = new()
                     {
-                        Uuid = model.ManagerUUID,
+                        Uuid = model.ZatcaUUID,
                         InvoiceHash = model.InvoiceHash,
                         Invoice = model.Base64SignedInvoice
                     };
@@ -328,19 +317,20 @@ namespace ZatcaEGS.Controllers
 
                     model.RequestType = apiResponse.RequestType;
                     model.StatusCode = apiResponse.StatusCode;
-                    model.ClearanceStatus = apiResponse.ClearanceStatus;
-                    model.ReportingStatus = apiResponse.ReportingStatus;
-                    model.CsrType = _deviceSetup.CsrType;
+
+                    model.ApprovalStatus = apiResponse.ReportingStatus;
+
+                    model.EnvironmentType = _deviceSetup.EnvironmentType;
                     model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
-                    if (model.ReportingStatus == "REPORTED")
+                    //Also Save Rejected Invoice, Need New ICV and PIH to resend Corrected Documents
+                    if (model.ApprovalStatus.Contains("REPORTED"))
                     {
                         model.Timestamp = DateTime.Now;
 
                         _dbContext.ApprovedInvoices.Add(model);
                         await _dbContext.SaveChangesAsync();
                     }
-
                     return View("Index", model);
                 }
 
@@ -352,6 +342,7 @@ namespace ZatcaEGS.Controllers
             }
         }
 
+        //Update Manager Invoice
         [HttpPost("update-invoice")]
         public async Task<IActionResult> UpdateInvoice([FromForm] ApprovedInvoice model)
         {

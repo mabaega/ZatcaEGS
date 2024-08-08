@@ -1,15 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Zatca.eInvoice.Helpers;
 using ZatcaEGS.Helpers;
 
 namespace ZatcaEGS.Models
 {
-    public enum EnumCsrType
-    {
-        NonProduction,
-        Simulation,
-        Production
-    }
+    //public enum EnvironmentType
+    //{
+    //    NonProduction,
+    //    Simulation,
+    //    Production
+    //}
 
     public class DeviceSetup
     {
@@ -111,7 +112,7 @@ namespace ZatcaEGS.Models
 
         [Required(ErrorMessage = "CSR Type is required.")]
         [Display(Name = "CSR Type")]
-        public EnumCsrType CsrType { get; set; }
+        public EnvironmentType EnvironmentType { get; set; }
 
         //[Required(ErrorMessage = "CSR Common Name is required.")]
         [Display(Name = "CSR Common Name")]
@@ -137,8 +138,8 @@ namespace ZatcaEGS.Models
         [Display(Name = "CSR Country Name")]
         public string CsrCountryName { get; set; }
 
-        //[Required(ErrorMessage = "CSR Csr Invoice Type is required.")]
-        [Display(Name = "CSR Csr Invoice Type")]
+        //[Required(ErrorMessage = "CSR Invoice Type is required.")]
+        [Display(Name = "CSR Invoice Type")]
         public string CsrInvoiceType { get; set; }
 
         //[Required(ErrorMessage = "CSR Location Address is required.")]
@@ -211,20 +212,15 @@ namespace ZatcaEGS.Models
         public bool IsRegistered() => !string.IsNullOrEmpty(CCSIDComplianceRequestId) && !string.IsNullOrEmpty(CCSIDBinaryToken) && !string.IsNullOrEmpty(CCSIDSecret) && !string.IsNullOrEmpty(PCSIDBinaryToken) && !string.IsNullOrEmpty(PCSIDSecret);
 
     }
-
-    public class OnboardingDto
-    {
-        public string CSR { get; set; }
-        public string CCSIDUrl { get; set; }
-        public string PCSIDUrl { get; set; }
-        public string CCSIDOTP { get; set; }
-    }
-
-    public class OnboardingResultDto
+    public class CCSIDResultDto
     {
         public string CCSIDComplianceRequestId { get; set; }
         public string CCSIDBinaryToken { get; set; }
         public string CCSIDSecret { get; set; }
+    }
+
+    public class PCSIDResultDto
+    {
         public string PCSIDBinaryToken { get; set; }
         public string PCSIDSecret { get; set; }
         public DateTime RegisteredDate { get; set; }

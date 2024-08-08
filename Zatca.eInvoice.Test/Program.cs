@@ -1,8 +1,5 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Zatca.eInvoice;
 using Zatca.eInvoice.Helpers;
@@ -105,7 +102,7 @@ public class ZatcaService
     }
 
 
-    public async Task<SignedInvoiceResult> CreateSignedInvoice(string PCSIDBinaryToken, string EcSecp256k1Privkeypem)
+    public async Task<SignedInvoiceResult> CreateSignedInvoice(string CSIDBinaryToken, string EcSecp256k1Privkeypem)
     {
         try
         {
@@ -331,7 +328,7 @@ public class ZatcaService
 
             InvoiceGenerator ig = new(
                 invoiceObject,
-                Encoding.UTF8.GetString(Convert.FromBase64String(PCSIDBinaryToken)),
+                Encoding.UTF8.GetString(Convert.FromBase64String(CSIDBinaryToken)),
                 EcSecp256k1Privkeypem
             );
 
@@ -550,7 +547,8 @@ class Program
                 Console.WriteLine($"PCSID Secret:\n{result.PCSIDSecret}  \n\n");
 
                 // Step 2: Create Signed Invoice
-                var signedInvoiceResult = await zatcaService.CreateSignedInvoice(result.PCSIDBinaryToken, result.PrivateKey);
+                //var signedInvoiceResult = await zatcaService.CreateSignedInvoice(result.PCSIDBinaryToken, result.PrivateKey);
+                var signedInvoiceResult = await zatcaService.CreateSignedInvoice(result.CCSIDBinaryToken, result.PrivateKey);
 
                 Console.WriteLine("Signed Invoice Result:\n\n");
                 //Console.WriteLine($"Base64 Signed Invoice:\n{signedInvoiceResult.Base64SignedInvoice} \n");
@@ -580,6 +578,9 @@ class Program
 
 
                 // Decode Base64QrCode
+                
+                Console.WriteLine("\nDecoding Generated QRCode:");
+                Console.WriteLine();
                 string qrCodeContent = signedInvoiceResult.Base64QrCode;
                 var decodedContent = QrCodeDecoder.DecodeQRCode(qrCodeContent);
                 QrCodeDecoder.PrintDecodedContent(decodedContent);

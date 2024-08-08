@@ -56,6 +56,5 @@ namespace Zatca.eInvoice.Helpers
         Production
     }
 
-
 }
 

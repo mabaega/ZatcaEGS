@@ -1,4 +1,5 @@
-﻿@model ZatcaEGS.Models.DeviceSetup
+﻿@using Zatca.eInvoice.Helpers
+@model ZatcaEGS.Models.DeviceSetup
 
 @{
     ViewData["Title"] = "Device Setup";
@@ -220,7 +221,7 @@
                                     <input asp-for="CsrIndustryBusinessCategory" class="form-control form-control-sm" readonly />
                                 </div>
                             </div>
-                            
+
 
                             <div class="col-md-3 mb-3">
                                 <div class="form-group">
@@ -280,9 +281,9 @@
 
                             <div class="col-md-3 mb-3">
                                 <div class="form-group">
-                                    <label style="color: var(--bs-success);" class="form-label" asp-for="CsrType">Select CSR Type</label>
-                                    <select asp-for="CsrType" class="form-control form-control-sm" disabled="@Model.IsRegistered()">
-                                        @foreach (var value in Enum.GetValues(typeof(EnumCsrType)))
+                                    <label style="color: var(--bs-success);" class="form-label" asp-for="EnvironmentType">Select CSR Type</label>
+                                    <select asp-for="EnvironmentType" class="form-control form-control-sm" disabled="@Model.IsRegistered()">
+                                        @foreach (var value in Enum.GetValues(typeof(EnvironmentType)))
                                         {
                                             <option value="@value">@value</option>
                                         }
@@ -356,18 +357,18 @@
                             </div>
 
                             <!-- Middle-center align OTP-->
-                            <div id="onboardingContainer" class="col-md-2 d-flex flex-column justify-content-center" style="padding-block-start: 5px; border-left: 1px solid var(--bs-border-color-translucent);">
+                            <div id="ccsidContainer" class="col-md-2 d-flex flex-column justify-content-center" style="padding-block-start: 5px; border-left: 1px solid var(--bs-border-color-translucent);">
                                 <div class="form-group mb-3 text-center">
                                     <label class="form-label">CCSID OTP</label>
                                     <input type="text" id="CCSIDOTP" class="form-control form-control-sm text-center" readonly="@Model.IsRegistered()">
                                 </div>
                                 <div class="d-flex justify-content-center">
-                                    <button id="ccsidButton" type="button" disabled="@Model.IsRegistered()" class="btn btn-outline-warning btn-sm">Get CCSID & PCSID</button>
+                                    <button id="ccsidButton" type="button" disabled="@Model.IsRegistered()" class="btn btn-outline-warning btn-sm">Get CCSID</button>
                                 </div>
                             </div>
 
 
-                            <!-- Additional form content -->
+                            <!-- CCSID content -->
                             <div class="col-md-12 mb-3 mt-3">
                                 <div class="form-group">
                                     <label class="form-label" asp-for="CCSIDBinaryToken">CCSID Binary Token</label>
@@ -382,10 +383,18 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <div class="form-group">
                                     <label class="form-label" asp-for="CCSIDComplianceRequestId">CCSID Compliance Request ID</label>
                                     <input asp-for="CCSIDComplianceRequestId" class="form-control form-control-sm" readonly />
+                                </div>
+                            </div>
+
+
+                            <!-- PCSID content -->
+                            <div id="pcsidContainer" class="col-md-3 d-flex flex-column justify-content-center" style="padding-block-start: 5px; border-left: 1px solid var(--bs-border-color-translucent);">
+                                <div class="d-flex justify-content-center">
+                                    <button type="button" id="pcsidButton" class="btn btn-outline-success btn-sm" disabled="@Model.IsRegistered()"> Get PCSID</button>
                                 </div>
                             </div>
 
@@ -403,6 +412,7 @@
                                 </div>
                             </div>
 
+
                             <div class="col-md-3 mb-3">
                                 <div class="form-group">
                                     <label class="form-label" asp-for="RegisteredDate">Registered Date</label>
@@ -415,10 +425,12 @@
 
                 </div>
             </div>
+
             <div class="card-footer">
                 <button type="button" class="btn btn-outline-secondary btn-sm" name="previous">Previous</button>
 
-                @if (@Model.IsRegistered()){
+                @if (@Model.IsRegistered())
+                {
                     <button type="button" class="btn btn-outline-warning btn-sm" name="editCustomField">Edit CustomFields</button>
                 }
 
@@ -429,6 +441,8 @@
     </div>
 </div>
 
+<div class="loading-indicator" id="loadingIndicator"></div>
+
 @section Scripts {
     <script>
         $(function () {
@@ -436,10 +450,17 @@
             var $navLinks = $('#wizardNav .nav-link');
             var currentIndex = 0;
 
+            function showLoading() {
+                document.getElementById('loadingIndicator').style.display = 'block';
+            }
+
+            function hideLoading() {
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+
             function updateButtons() {
                 $('[name="previous"]').toggleClass('d-none', currentIndex === 0);
                 $('[name="editCustomField"]').toggleClass('d-none', currentIndex !== 0);
-
                 $('[name="next"]').toggleClass('d-none', currentIndex === $tabs.length - 1);
                 $('[name="finish"]').toggleClass('d-none', currentIndex !== $tabs.length - 1);
                 $navLinks.removeClass('active');
@@ -461,7 +482,7 @@
                     var guidPattern = /\b[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/;
 
                     if (!csrSerialNumberInput || !guidPattern.test(csrSerialNumberInput)) {
-                        var uuid = uuidv4(); // Function to generate a UUID
+                        var uuid = uuidv4();
                         var csrSerialNumber = "1-MGR|2-MGR|3-" + uuid;
                         $("#CsrSerialNumber").val(csrSerialNumber);
                     }
@@ -477,8 +498,8 @@
             }
 
             $('[name="editCustomField"]').on('click', function () {
-                $('#managerDataField input').removeAttr('readonly'); // Remove readonly attribute from all inputs inside the tab
-                $(this).remove(); // Remove the Edit CustomFields button
+                $('#managerDataField input').removeAttr('readonly');
+                $(this).remove();
             });
 
             $('[name="next"]').on('click', function () {
@@ -511,7 +532,6 @@
                 updateButtons();
             });
 
-            // Function to generate UUID (v4)
             function uuidv4() {
                 return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -519,8 +539,8 @@
                 });
             }
 
-
             $('#generateCSRButton').on('click', function () {
+                showLoading();
                 var csrData = {
                     CommonName: $('#CsrCommonName').val(),
                     SerialNumber: $('#CsrSerialNumber').val(),
@@ -533,45 +553,42 @@
                     IndustryBusinessCategory: $('#CsrIndustryBusinessCategory').val()
                 };
 
-                if (!csrData.CommonName ||
-                    !csrData.SerialNumber ||
-                    !csrData.OrganizationIdentifier ||
-                    !csrData.OrganizationUnitName ||
-                    !csrData.OrganizationName ||
-                    !csrData.CountryName ||
-                    !csrData.InvoiceType ||
-                    !csrData.LocationAddress ||
-                    !csrData.IndustryBusinessCategory) {
+                var environmentType = $('#EnvironmentType').val(); // Get the environment type value
+
+                if (Object.values(csrData).some(val => !val)) {
+                    hideLoading();
                     alert("Please provide all required inputs.");
                     return;
                 }
 
                 $.ajax({
-                    url: '/generatecsr',
+                    url: '/generatecsr?environmentType=' + environmentType, // Include environment type in the query string
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(csrData),
                     success: function (response) {
                         $('#GeneratedCSR').val(response.csr);
                         $('#EcSecp256k1Privkeypem').val(response.privateKey);
-
                         checkGeneratedCSR();
-                        alert('CSR berhasil di-generate!');
+                        hideLoading();
+                        alert('CSR Generated Successfully!');
                     },
                     error: function (xhr) {
                         var errorResponse = JSON.parse(xhr.responseText);
-                        var errorMessage = 'Errors:\n' + errorResponse.errors.join('\n');
-                        alert(errorMessage);
+                        hideLoading();
+                        alert('Errors:\n' + errorResponse.errors.join('\n'));
                     }
                 });
             });
 
-            
             $("#ccsidButton").on('click', function () {
+                showLoading();
+
                 var formData = new FormData($('#deviceSetupForm')[0]);
-                formData.append('OTP', $("#CCSIDOTP").val()); 
+                formData.append('OTP', $("#CCSIDOTP").val());
 
                 if (!formData.get('GeneratedCSR') || !formData.get('ComplianceCSIDUrl') || !formData.get('ProductionCSIDUrl') || !formData.get('OTP')) {
+                    hideLoading();
                     alert("Please provide all required inputs.");
                     return;
                 }
@@ -583,65 +600,87 @@
                     contentType: false,
                     data: formData,
                     success: function (response) {
-
                         $("#CCSIDBinaryToken").val(response.ccsidBinaryToken);
                         $("#CCSIDSecret").val(response.ccsidSecret);
                         $("#CCSIDComplianceRequestId").val(response.ccsidComplianceRequestId);
-                        $("#PCSIDBinaryToken").val(response.pcsidBinaryToken);
-                        $("#PCSIDSecret").val(response.pcsidSecret);
-                        var formattedDate = response.registeredDate.slice(0, 16);
-                        $("#RegisteredDate").val(formattedDate);
-
-                        alert('Device Registered Successfully!');
-
-                        checkOnboardingContainer();
+                        checkCcsidContainer();
+                        hideLoading();
+                        alert('CCSID Generated Successfully!');
                     },
                     error: function (xhr, status, error) {
+                        hideLoading();
                         alert("Error: " + xhr.responseText);
                     }
                 });
             });
 
+            $("#pcsidButton").on('click', function () {
+                showLoading();
+                var formData = new FormData($('#deviceSetupForm')[0]);
+
+                if (!formData.get('CCSIDBinaryToken') || !formData.get('ProductionCSIDUrl') || !formData.get('CCSIDSecret')) {
+                    hideLoading();
+                    alert("Please provide all required inputs.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("GetPCSID", "Wizard")',
+                    type: 'POST',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (response) {
+                        $("#PCSIDBinaryToken").val(response.pcsidBinaryToken);
+                        $("#PCSIDSecret").val(response.pcsidSecret);
+                        var formattedDate = response.registeredDate.slice(0, 16);
+                        $("#RegisteredDate").val(formattedDate);
+                        checkPcsidContainer();
+                        hideLoading();
+                        alert('PCSID Generated Successfully!');
+                    },
+                    error: function (xhr, status, error) {
+                        hideLoading();
+                        alert("Error: " + xhr.responseText);
+                    }
+                });
+            });
 
             function checkGeneratedCSR() {
                 var generatedCSR = $("#GeneratedCSR").val();
                 var privateKey = $("#EcSecp256k1Privkeypem").val();
-
-                if (generatedCSR && privateKey) {
-                    $("#generateCSRButton").addClass("d-none");
-                } else {
-                    $("#generateCSRButton").removeClass("d-none");
-                }
+                $("#generateCSRButton").toggleClass("d-none", !!(generatedCSR && privateKey));
             }
 
-            function checkOnboardingContainer() {
+            function checkCcsidContainer() {
                 var cCSIDBinaryToken = $("#CCSIDBinaryToken").val();
-                var pCSIDBinaryToken = $("#PCSIDBinaryToken").val();
-
-                if (cCSIDBinaryToken && pCSIDBinaryToken) {
-                    $("#onboardingContainer").addClass("d-none");
-                    $("#urlContainer").removeClass("col-md-10").addClass("col-md-12");
-                } else {
-                    $("#onboardingContainer").removeClass("d-none");
-                    $("#urlContainer").removeClass("col-md-12").addClass("col-md-10");
-                }
+                $("#ccsidContainer").toggleClass("d-none", !!cCSIDBinaryToken);
+                $("#urlContainer").toggleClass("col-md-10", !cCSIDBinaryToken).toggleClass("col-md-12", !!cCSIDBinaryToken);
+                $("#pcsidContainer").toggleClass("d-none", !cCSIDBinaryToken);
             }
+
+            function checkPcsidContainer() {
+                var pCSIDBinaryToken = $("#PCSIDBinaryToken").val();
+                $("#pcsidContainer").toggleClass("d-none", !!pCSIDBinaryToken);
+            }
+
+
 
             $("#CCSIDBinaryToken, #PCSIDBinaryToken").on('input', function () {
-                checkOnboardingContainer();
+                checkCcsidContainer();
+                checkPcsidContainer();
             });
 
-            $("#GeneratedCSR, #EcSecp256k1Privkeypem").on('input', function () {
-                checkGeneratedCSR();
-            });
+            $("#GeneratedCSR, #EcSecp256k1Privkeypem").on('input', checkGeneratedCSR);
 
             // Initial setup
             updateButtons();
             handleTabShown($navLinks.eq(currentIndex).attr("href").substring(1));
             checkGeneratedCSR();
-            checkOnboardingContainer();
-
+            checkCcsidContainer();
+            checkPcsidContainer();
         });
     </script>
+
 }
 

@@ -33,7 +33,7 @@ namespace ZatcaEGS.Models
         public CustomFields2 CustomFields2 { get; set; }
     }
 
-    public class Item
+    public class LineItem
     {
         public string ItemCode { get; set; }
         public string ItemName { get; set; }
@@ -52,7 +52,7 @@ namespace ZatcaEGS.Models
 
     public class Line
     {
-        public Item Item { get; set; }
+        public LineItem Item { get; set; }
         public string LineDescription { get; set; }
         public Dictionary<string, string> CustomFields { get; set; }
         public CustomFields2 CustomFields2 { get; set; }

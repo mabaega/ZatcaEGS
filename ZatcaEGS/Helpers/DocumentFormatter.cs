@@ -28,7 +28,7 @@ namespace ZatcaEGS.Helpers
         }
 
 
-        public static string ExcludeClearanceStatus(string jsonString)
+        public static string ExcludeClearanceInvoice(string jsonString)
         {
             var jsonObject = JObject.Parse(jsonString);
             jsonObject.Property("clearedInvoice")?.Remove();

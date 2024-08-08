@@ -18,7 +18,7 @@ namespace ZatcaEGS.Controllers
             var models = _context.ApprovedInvoices.OrderByDescending(e => e.Timestamp).ToList();
             foreach (var item in models)
             {
-                item.ServerResult = DocumentFormatter.ExcludeClearanceStatus(item.ServerResult);
+                item.ServerResult = DocumentFormatter.ExcludeClearanceInvoice(item.ServerResult);
             }
             return View(models);
         }

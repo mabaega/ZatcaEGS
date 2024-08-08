@@ -8,7 +8,7 @@ namespace ZatcaEGS.Helpers
 {
     public class RelayToInvoiceMapper
     {
-        public static Invoice GenerateInvoiceObject(RelayData relayData, DeviceSetup deviceSetup, Int32 iCv, string pIh)
+        public static Invoice GenerateInvoiceObject(RelayData relayData, DeviceSetup deviceSetup, string zatcaUUID, Int32 iCv, string pIh)
         {
             var managerInvoicejson = InvoiceHelper.GetManagerInvoiceJson(relayData);
             ManagerInvoice managerInvoice = JsonConvert.DeserializeObject <ManagerInvoice>(managerInvoicejson);
@@ -32,7 +32,7 @@ namespace ZatcaEGS.Helpers
             {
                 ProfileID = "reporting:1.0",
                 ID = new ID(managerInvoice.Reference),
-                UUID = relayData.Key,
+                UUID = zatcaUUID, //relayData.Key, Handle Rejected Document
                 IssueDate = managerInvoice.IssueDate.ToString("yyyy-MM-dd"),
                 IssueTime = "00:00:00",
                 InvoiceTypeCode = new InvoiceTypeCode((InvoiceType) invoiceType, invoiceSubType),
@@ -128,7 +128,7 @@ namespace ZatcaEGS.Helpers
                     },
                     PartyTaxScheme = new PartyTaxScheme
                     {
-                        CompanyID = deviceSetup.CompanyID,
+                        CompanyID = deviceSetup.EnvironmentType == EnvironmentType.NonProduction ? "399999999900003" : deviceSetup.CompanyID,
                         TaxScheme = new TaxScheme
                         {
                             ID = new ID(deviceSetup.TaxSchemeID)

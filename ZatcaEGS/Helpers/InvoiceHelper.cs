@@ -65,6 +65,20 @@ namespace ZatcaEGS.Helpers
             return (lastInvoice.ICV + 1, lastInvoice.PIH);
         }
 
+        public static string GetZatcaUUID(AppDbContext _dbContext, string managerUUID)
+        {
+            int invoiceCount = _dbContext.ApprovedInvoices.Where(invoice => invoice.ManagerUUID == managerUUID).Count();
+
+            if (invoiceCount == 0)
+            {
+                return managerUUID;
+            }
+            else 
+            {
+                return managerUUID.Substring(0, managerUUID.Length - 12) + invoiceCount.ToString("000000000000");
+            }
+        }
+
         public static string ModifyQrInEditData(string editData, string qrFieldGuid, string newValue)
         {
             JObject jsonObject = JObject.Parse(editData);

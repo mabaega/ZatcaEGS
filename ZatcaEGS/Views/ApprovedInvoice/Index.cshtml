@@ -24,8 +24,9 @@
                         <th>Total Amount</th>
                         <th>ICV</th>
                         <th>Request Type</th>
-                        <th>Clearance Status</th>
-                        <th>Reporting Status</th>
+                        <td>Approval Status</td>
+                        @* <th>Clearance Status</th>
+                        <th>Reporting Status</th> *@
                         <th>Result</th>
                         <th style="display: none;">ServerResult</th> 
                     </tr>
@@ -46,8 +47,9 @@
                             <td>@item.TotalAmount.ToString("N2")</td>
                             <td>@item.ICV</td>
                             <td>@item.RequestType</td>
-                            <td>@item.ClearanceStatus</td>
-                            <td>@item.ReportingStatus</td>
+                            <td>@item.ApprovalStatus</td>
+                            @* <td>@item.ClearanceStatus</td>
+                            <td>@item.ReportingStatus</td> *@
                             <td><a href="#" class="viewResult"><i class="fa fa-file-text"></i></a></td>
                             <td style="display: none;">@item.ServerResult</td>
                         </tr>
@@ -126,9 +128,9 @@
                     searchPlaceholder: "Search records",
                 },
                 "columnDefs": [
-                    { "targets": [1, 2, 3, 4, 6, 10, 11, 12, 13, 14], "className": "text-center" },
+                    { "targets": [2, 3, 4, 6, 10, 11, 12, 13], "className": "text-center" },
                     { "targets": [7, 8, 9], "className": "text-end" },
-                    { "targets": [15], "visible": false } 
+                    { "targets": [14], "visible": false } 
                 ],
                 layout: {
                     topStart: 'search',
@@ -142,7 +144,7 @@
                                 text: '<i class="fa fa-files-o"></i>',
                                 titleAttr: 'Copy',
                                 exportOptions: {
-                                    columns: ':not(:eq(14), :eq(15))'
+                                    columns: ':not(:eq(13), :eq(14))'
                                 }
                             },
                             {
@@ -150,17 +152,21 @@
                                 text: '<i class="fa fa-file-excel-o"></i>',
                                 titleAttr: 'Excel',
                                 exportOptions: {
-                                    columns: ':not(:eq(14), :eq(15))'
+                                    columns: ':not(:eq(13), :eq(14))'
                                 }
                             },
-                            {
-                                extend: 'pdfHtml5',
-                                text: '<i class="fa fa-file-pdf-o"></i>',
-                                titleAttr: 'PDF',
-                                exportOptions: {
-                                    columns: ':not(:eq(14), :eq(15))'
-                                }
-                            }
+                            // {
+                            //     extend: 'pdfHtml5',
+                            //     text: '<i class="fa fa-file-pdf-o"></i>',
+                            //     titleAttr: 'PDF',
+                            //     orientation: 'landscape',
+                            //     customize: function (doc) {
+                            //         doc.defaultStyle.font = 'Arial';
+                            //     },
+                            //     exportOptions: {
+                            //         columns: ':not(:eq(13), :eq(14))'
+                            //     }
+                            // }
                         ]
                     },
                 },
@@ -176,7 +182,7 @@
 
                 var $tr = $(this).closest('tr');
                 var data = $('#datatable').DataTable().row($tr).data();
-                var serverResult = data[15]; 
+                var serverResult = data[14]; 
 
                 try {
                     var formattedJSON = JSON.stringify(JSON.parse(serverResult), null, 4);
