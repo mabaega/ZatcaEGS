@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Reflection;
 using System.Text.Json.Serialization;
+using ZatcaEGS.Helpers;
 using ZatcaEGS.Models;
 
 //dotnet build --self-contained -p:GenerateRuntimeConfigurationFiles=false -p:GenerateDependencyFile=false
@@ -84,6 +86,9 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(dbPath));
 builder.Services.AddControllersWithViews();
+
+var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0.0";
+builder.Services.AddSingleton(new AppVersionService(version));
 
 var app = builder.Build();
 

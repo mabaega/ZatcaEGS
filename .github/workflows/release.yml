@@ -34,18 +34,16 @@ jobs:
     - name: Update ZatcaEGS version
       run: |
         VERSION=${{ env.VERSION }}
-        MAJOR_MINOR_PATCH=$(echo $VERSION | awk -F. '{print $1 "." $2 "." $3}')
-        echo "Updating to version: $MAJOR_MINOR_PATCH.0"
-        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$MAJOR_MINOR_PATCH.0</AssemblyVersion>|g" ZatcaEGS/ZatcaEGS.csproj
-        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$MAJOR_MINOR_PATCH.0</FileVersion>|g" ZatcaEGS/ZatcaEGS.csproj
+        echo "Updating to version: $VERSION"
+        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$VERSION</AssemblyVersion>|g" ZatcaEGS/ZatcaEGS.csproj
+        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$VERSION</FileVersion>|g" ZatcaEGS/ZatcaEGS.csproj
 
     - name: Update CFGenerator version
       run: |
         VERSION=${{ env.VERSION }}
-        MAJOR_MINOR_PATCH=$(echo $VERSION | awk -F. '{print $1 "." $2 "." $3}')
-        echo "Updating to version: $MAJOR_MINOR_PATCH.0"
-        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$MAJOR_MINOR_PATCH.0</AssemblyVersion>|g" CFGenerator/CFGenerator.csproj
-        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$MAJOR_MINOR_PATCH.0</FileVersion>|g" CFGenerator/CFGenerator.csproj
+        echo "Updating to version: $VERSION"
+        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$VERSION</AssemblyVersion>|g" CFGenerator/CFGenerator.csproj
+        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$VERSION</FileVersion>|g" CFGenerator/CFGenerator.csproj
 
     - name: Build ZatcaEGS project
       run: dotnet build ZatcaEGS/ZatcaEGS.csproj --configuration Release
@@ -60,6 +58,7 @@ jobs:
       run: |
         cp CFGenerator/bin/Release/net8.0/win-x64/CFGenerator.exe publish/
         cp CFGenerator/bin/Release/net8.0/win-x64/CFGenerator.dll publish/
+        cp CFGenerator/bin/Release/net8.0/win-x64/*.*.json publish/
 
     - name: Zip the publish folder
       run: zip -r ZatcaEGS_${{ env.VERSION }}.zip publish/*

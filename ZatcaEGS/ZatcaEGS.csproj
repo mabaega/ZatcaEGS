@@ -10,6 +10,21 @@
 		<PublishSingleFile>true</PublishSingleFile>
 		<PackageIcon>apple-icon.png</PackageIcon>
 		<ApplicationIcon>wwwroot\favicon.ico</ApplicationIcon>
+		<SignAssembly>False</SignAssembly>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<AssemblyVersion>1.0.1.0</AssemblyVersion>
+		<FileVersion>1.0.1.0</FileVersion>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -34,6 +49,10 @@
 	<ItemGroup>
 	  <Content Remove="wwwroot\images\apple-icon.png" />
 	  <Content Remove="wwwroot\js\site.js" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Views\Shared\_Layout.cshtml.css" />
 	</ItemGroup>
 
 	<ItemGroup>
