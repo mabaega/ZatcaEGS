@@ -34,16 +34,18 @@ jobs:
     - name: Update ZatcaEGS version
       run: |
         VERSION=${{ env.VERSION }}
-        echo "Updating to version: $VERSION"
-        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$VERSION</AssemblyVersion>|g" ZatcaEGS/ZatcaEGS.csproj
-        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$VERSION</FileVersion>|g" ZatcaEGS/ZatcaEGS.csproj
+        VERSION_FORMATTED=$(echo $VERSION | sed 's/-test//')
+        echo "Updating to version: $VERSION_FORMATTED"
+        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$VERSION_FORMATTED</AssemblyVersion>|g" ZatcaEGS/ZatcaEGS.csproj
+        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$VERSION_FORMATTED</FileVersion>|g" ZatcaEGS/ZatcaEGS.csproj
 
     - name: Update CFGenerator version
       run: |
         VERSION=${{ env.VERSION }}
-        echo "Updating to version: $VERSION"
-        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$VERSION</AssemblyVersion>|g" CFGenerator/CFGenerator.csproj
-        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$VERSION</FileVersion>|g" CFGenerator/CFGenerator.csproj
+        VERSION_FORMATTED=$(echo $VERSION | sed 's/-test//')
+        echo "Updating to version: $VERSION_FORMATTED"
+        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$VERSION_FORMATTED</AssemblyVersion>|g" CFGenerator/CFGenerator.csproj
+        sed -i "s|<FileVersion>.*</FileVersion>|<FileVersion>$VERSION_FORMATTED</FileVersion>|g" CFGenerator/CFGenerator.csproj
 
     - name: Build ZatcaEGS project
       run: dotnet build ZatcaEGS/ZatcaEGS.csproj --configuration Release
