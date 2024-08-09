@@ -56,11 +56,9 @@ jobs:
     - name: Publish ZatcaEGS
       run: dotnet publish ZatcaEGS/ZatcaEGS.csproj --configuration Release --output publish
 
-    - name: Copy CFGenerator output to publish folder
+    - name: Copy CFGenerator output to publish/CFGenerator folder
       run: |
-        cp CFGenerator/bin/Release/net8.0/win-x64/CFGenerator.exe publish/
-        cp CFGenerator/bin/Release/net8.0/win-x64/CFGenerator.dll publish/
-        cp CFGenerator/bin/Release/net8.0/win-x64/*.*.json publish/
+        cp CFGenerator/bin/Release/net8.0/win-x64/* publish/CFGenerator/
 
     - name: Zip the publish folder
       run: zip -r ZatcaEGS_${{ env.VERSION }}.zip publish/*
