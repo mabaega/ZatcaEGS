@@ -10,8 +10,8 @@
     <Configurations>Debug;Release;PORTABLE;DebugP;ReleaseP</Configurations>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>24.09.02.0004</AssemblyVersion>
-    <FileVersion>24.09.02.0004</FileVersion>
+    <AssemblyVersion>24.09.02.0005</AssemblyVersion>
+    <FileVersion>24.09.02.0005</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Helpers\PartyTaxInfoParser.cs" />
