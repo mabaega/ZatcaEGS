@@ -1,0 +1,68 @@
+﻿@model RelayViewModel
+@{
+    ViewData["Title"] = "Info";
+}
+
+<div class="container mt-n25">
+    <div class="alert alert-info text-center">
+        <h2>Invoice Reporting / Clearance</h2>
+        <p class="lead">This invoice has been reported and approved previously.</p>
+
+        @if (!string.IsNullOrEmpty(Model.ZatcaUUID))
+        {
+            <div>
+                <p class="lead">@Model.ZatcaUUID</p>
+            </div>
+        }
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <div class="qr-code-card">
+                <div id="qrCodeImage"></div>
+            </div>
+        </div>
+
+        @* Pastikan ErrorMessage memang ingin digunakan, atau mungkin Anda ingin menampilkan QR code dari properti lain *@
+        @*
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+        <p class="lead">@Html.Raw(Model.ErrorMessage)</p>
+        }
+        *@
+
+        @if (Model.ShowSetupLink)
+        {
+            <p>
+                <a href="/wizard" class="btn btn-primary">Device Setup</a>
+            </p>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.ReferrerLink))
+        {
+            <p>
+                <a href="@Model.ReferrerLink" class="btn btn-primary">Go back to the previous page</a>
+            </p>
+        }
+
+    </div>
+</div>
+
+<script src="~/js/qrcode.js"></script>
+<script>
+
+    function generateQRCode(text) {
+        new QRCode(document.getElementById("qrCodeImage"), {
+            text: text,
+            width: 180,
+            height: 180,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.L
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var Base64QrCode = "@Model.Base64QrCode".replace(/&#x2B;/g, '+'); // Pastikan nilai yang digunakan tepat
+        generateQRCode(Base64QrCode);
+    });
+</script>

@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<Configurations>Debug;Release;PORTABLE;DebugP;ReleaseP</Configurations>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<AssemblyVersion>1.0.0.1</AssemblyVersion>
+		<FileVersion>1.0.0.1</FileVersion>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<None Remove="Resources\ZatcaDataInvoice.xsl" />
+		<None Remove="Resources\ZatcaDataQr.xml" />
+		<None Remove="Resources\ZatcaDataSignature.xml" />
+		<None Remove="Resources\ZatcaDataUbl.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\ZatcaDataUbl.xml" />
+		<EmbeddedResource Include="Resources\ZatcaDataInvoice.xsl" />
+		<EmbeddedResource Include="Resources\ZatcaDataQr.xml" />
+		<EmbeddedResource Include="Resources\ZatcaDataSignature.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
+		<PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.1" />
+	</ItemGroup>
+
+
+</Project>

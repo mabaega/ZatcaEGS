@@ -1,0 +1,690 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Zatca.EGS.Models;
+using Zatca.eInvoice.Models;
+using Zatca.EGS.Helpers;
+using System.Text;
+using Zatca.eInvoice;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Xml.Serialization;
+using Newtonsoft.Json.Linq;
+
+namespace Zatca.EGS.Controllers
+{
+    [ApiController]
+    public class RelayController : Controller
+    {
+        private CertificateInfo GetCertificateInfoFromSession()
+        {
+            var certInfoJson = HttpContext.Session.GetString("CertInfo");
+            return string.IsNullOrEmpty(certInfoJson) ? null : JsonConvert.DeserializeObject<CertificateInfo>(certInfoJson);
+        }
+
+        private void SetCertificateInfoInSession(CertificateInfo certInfo)
+        {
+            var certInfoJson = JsonConvert.SerializeObject(certInfo);
+            HttpContext.Session.SetString("CertInfo", certInfoJson);
+        }
+
+        private readonly HttpClient _httpClient = new();
+
+
+        [HttpPost("relay")]
+        public async Task<IActionResult> ProcessFormData([FromForm] Dictionary<string, string> formData)
+        {
+            try
+            {
+                var relayData = new RelayData(formData);
+
+                var approvalStatus = relayData.ApprovalStatus;
+
+                if (!string.IsNullOrEmpty(approvalStatus) && !approvalStatus.Contains("REJECTED"))
+                {
+                    var RelayModel = new RelayViewModel
+                    {
+                        ZatcaUUID = relayData.ZatcaUUID,
+                        Base64QrCode = relayData.Base64QrCode,
+                        ReferrerLink = relayData.Referrer,
+                        ShowSetupLink = false,
+                    };
+
+                    return View("Info", RelayModel);
+                }
+
+
+                var _certInfo = relayData.CertificateInfo;
+
+                if (_certInfo == null)
+                {
+                    var CertificateViewModel = new CertificateViewModel
+                    {
+                        ReferrerLink = relayData.Referrer,
+                        ShowSetupLink = true,
+                    };
+
+                    return View("Certificate", CertificateViewModel);
+                }
+
+                SetCertificateInfoInSession(_certInfo);
+
+
+                (string icv, string pih) = await ZatcaReference.GetReferenceFolder(_certInfo.ApiEndpoint, _certInfo.ApiSecret);
+
+                if (!string.IsNullOrEmpty(icv) && int.TryParse(icv, out int icvNumber))
+                {
+                    relayData.LastICV = icvNumber;
+                }
+                if (!string.IsNullOrEmpty(pih))
+                {
+                    relayData.LastPIH = pih;
+                }
+
+
+                string zatcaUUID = relayData.Key;
+
+                if (!string.IsNullOrEmpty(approvalStatus) && approvalStatus.Contains("REJECTED"))
+                {
+                    var sNumber = relayData.ZatcaUUID.Substring(relayData.Key.Length - 12, 12);
+
+                    if (int.TryParse(sNumber, out int numericValue))
+                    {
+                        sNumber = (numericValue + 1).ToString("D12");
+                    }
+                    else
+                    {
+                        sNumber = "000000000001";
+                    }
+
+                    zatcaUUID = string.Concat(zatcaUUID.AsSpan(0, relayData.Key.Length - 12), sNumber);
+                }
+                relayData.ZatcaUUID = zatcaUUID;
+
+
+                var mapper = new RelayToInvoiceMapper(relayData);
+                Invoice invoice = mapper.GenerateInvoiceObject();
+
+                InvoiceGenerator ig = new(
+                    invoice,
+                    Encoding.UTF8.GetString(Convert.FromBase64String(_certInfo.PCSIDBinaryToken)),
+                    _certInfo.EcSecp256k1Privkeypem
+                );
+
+                ig.GetSignedInvoiceXML(out string InvoiceHash, out string base64SignedInvoice, out string base64QrCode, out string XmlFileName, out string requestApi);
+
+                ManagerInvoice managerInvoice = relayData.ManagerInvoice;
+                int ICV = relayData.LastICV + 1;
+
+                var amount = invoice.LegalMonetaryTotal.TaxExclusiveAmount.NumericValue;
+                var totalAmount = invoice.LegalMonetaryTotal.TaxInclusiveAmount.NumericValue;
+                var taxAmount = totalAmount - amount;
+
+                ApprovedInvoice approvedInvoice = new()
+                {
+                    ManagerUUID = relayData.Key,
+
+                    ZatcaUUID = zatcaUUID,
+                    InvoiceHash = InvoiceHash,
+                    Base64SignedInvoice = base64SignedInvoice,
+
+                    InvoiceType = invoice.InvoiceTypeCode?.Value,
+                    InvoiceSubType = invoice.InvoiceTypeCode?.Name,
+                    Reference = managerInvoice?.Reference,
+                    IssueDate = managerInvoice?.IssueDate.ToString("yyyy-MM-dd"),
+                    PartyName = managerInvoice?.InvoiceParty?.Name,
+                    CurrencyCode = managerInvoice?.InvoiceParty?.Currency?.Code ?? "SAR",
+                    Amount = amount,
+                    TaxAmount = taxAmount,
+                    TotalAmount = totalAmount,
+
+                    Base64QrCode = base64QrCode,
+                    XmlFileName = XmlFileName,
+                    Referrer = relayData.Referrer,
+                    CallBack = relayData.Callback,
+                    ICV = ICV,
+
+                    Timestamp = DateTime.Now,
+                    EditData = relayData.Data,
+
+                    EnvironmentType = _certInfo.EnvironmentType,
+                };
+
+                return View("Index", approvedInvoice);
+
+            }
+            catch
+            {
+                var errorModel = new ErrorViewModel
+                {
+                    ErrorMessage = @"Please review the Device Settings in the EGS application to ensure it matches your business data setup.",
+                    ReferrerLink = formData.GetValueOrDefault("Referrer")
+                };
+                return View("Error", errorModel);
+            }
+        }
+
+        [HttpPost("compliance-check")]
+        public async Task<IActionResult> ComplianceCheck([FromForm] ApprovedInvoice model)
+        {
+            try
+            {
+                var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
+
+                ZatcaRequestApi zatcaRequestApi = new()
+                {
+                    Uuid = model.ZatcaUUID,
+                    InvoiceHash = model.InvoiceHash,
+                    Invoice = model.Base64SignedInvoice
+                };
+
+                var jsonContent = JsonConvert.SerializeObject(zatcaRequestApi);
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
+                _httpClient.DefaultRequestHeaders.Add("Accept-Version", "V2");
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_certInfo.CCSIDBinaryToken}:{_certInfo.CCSIDSecret}")));
+
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(_certInfo.ComplianceCheckUrl, content);
+
+                var resultContent = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.Accepted || response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+
+                    var apiResponse = JsonConvert.DeserializeObject<ServerResult>(resultContent);
+
+                    apiResponse ??= new ServerResult();
+
+                    apiResponse.RequestUri = _certInfo.ComplianceCheckUrl;
+                    apiResponse.RequestType = "Invoice Compliant Check";
+                    apiResponse.StatusCode = $"{(int)response.StatusCode}-{response.StatusCode}";
+
+                    model.RequestType = apiResponse.RequestType;
+                    model.StatusCode = apiResponse.StatusCode;
+
+                    model.ApprovalStatus = string.IsNullOrEmpty(apiResponse.ClearanceStatus) ? apiResponse.ReportingStatus : apiResponse.ClearanceStatus;
+
+                    model.EnvironmentType = _certInfo.EnvironmentType;
+
+                    model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
+
+
+                }
+                else
+                {
+                    var apiResponse = JsonConvert.DeserializeObject<ApiResponse>(resultContent);
+                    apiResponse.RequestUri = _certInfo.ClearanceUrl;
+                    model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                }
+
+                return View("Index", model);
+            }
+            catch (Exception ex)
+            {
+                model.ServerResult = ex.Message;
+                return View("Index", model);
+            }
+        }
+
+        [HttpPost("clearance")]
+        public async Task<IActionResult> Clearance([FromForm] ApprovedInvoice model)
+        {
+            var testapi = await CheckMangerApiAsync(model.Referrer);
+
+            if (testapi)
+            {
+                try
+                {
+                    var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
+
+                    ZatcaRequestApi zatcaRequestApi = new()
+                    {
+                        Uuid = model.ZatcaUUID,
+                        InvoiceHash = model.InvoiceHash,
+                        Invoice = model.Base64SignedInvoice
+                    };
+
+                    var jsonContent = JsonConvert.SerializeObject(zatcaRequestApi);
+
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
+                    _httpClient.DefaultRequestHeaders.Add("Clearance-Status", "1");
+                    _httpClient.DefaultRequestHeaders.Add("Accept-Version", "V2");
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_certInfo.PCSIDBinaryToken}:{_certInfo.PCSIDSecret}")));
+
+                    var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                    var response = await _httpClient.PostAsync(_certInfo.ClearanceUrl, content);
+                    var resultContent = await response.Content.ReadAsStringAsync();
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.Accepted || response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        var apiResponse = JsonConvert.DeserializeObject<ServerResult>(resultContent);
+
+                        apiResponse = apiResponse ?? new ServerResult();
+
+                        if (apiResponse.ClearedInvoice != null)
+                        {
+                            var clearedInvoiceXml = Encoding.UTF8.GetString(Convert.FromBase64String(apiResponse.ClearedInvoice));
+
+                            model.Base64SignedInvoice = apiResponse.ClearedInvoice;
+
+                            XmlSerializer serializer = new(typeof(Invoice));
+                            using StringReader reader = new(clearedInvoiceXml);
+                            var clearedInvoice = (Invoice)serializer.Deserialize(reader);
+
+                            var qrCodeNode = clearedInvoice?.AdditionalDocumentReference?
+                                .FirstOrDefault(docRef => docRef.ID.Value == "QR")?.Attachment?.EmbeddedDocumentBinaryObject;
+
+                            if (qrCodeNode != null)
+                            {
+                                model.Base64QrCode = qrCodeNode.Value;
+                            }
+                        }
+
+                        apiResponse.RequestType = "Invoice Clearance";
+                        apiResponse.RequestUri = _certInfo.ClearanceUrl;
+                        apiResponse.StatusCode = $"{(int)response.StatusCode}-{response.StatusCode}";
+
+                        model.RequestType = apiResponse.RequestType;
+                        model.StatusCode = apiResponse.StatusCode;
+                        model.ApprovalStatus = apiResponse.ClearanceStatus;
+                        model.EnvironmentType = _certInfo.EnvironmentType;
+
+                        model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
+                        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || (apiResponse.ClearanceStatus != null && apiResponse.ClearanceStatus.Contains("NOT")))
+                        {
+                            model.ApprovalStatus = "REJECTED";
+                        }
+
+                        model.Timestamp = DateTime.Now;
+
+                        string approvalStatus = model.ApprovalStatus.Contains("NOT") ? "REJECTED" : model.ApprovalStatus;
+                        model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.ApprovedInvoiceGuid, approvalStatus);
+                        model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.ZatcaUUIDGuid, model.ZatcaUUID);
+
+                        if (!approvalStatus.Equals("REJECTED"))
+                        {
+                            model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.QrCodeGuid, model.Base64QrCode);
+                        }
+
+                        bool updateBusinessData = await ZatcaReference.UpdateReferenceFolder(_certInfo.ApiEndpoint, _certInfo.ApiSecret, model.ICV.ToString(), model.InvoiceHash);
+
+                        //Console.WriteLine(updateBusinessData);
+
+                        if (updateBusinessData)
+                        {
+                            string sanitizedReference = new(model.Reference.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray());
+                            string fileName = $"{model.IssueDate}_{sanitizedReference}_{model.ZatcaUUID}.txt";
+
+                            string fileContent = await ZatcaReference.UpdateInvoice(_certInfo, model);
+
+                            TempData.Clear();
+                            TempData["StringFileContent"] = fileContent;
+                            TempData["StringFileName"] = fileName;
+                        }
+                    }
+                    else
+                    {
+                        var apiResponse = JsonConvert.DeserializeObject<ApiResponse>(resultContent);
+                        apiResponse.RequestUri = _certInfo.ClearanceUrl;
+
+                        model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    }
+
+                    return View("Index", model);
+                }
+                catch (Exception ex)
+                {
+                    model.ServerResult = ex.Message;
+                    return View("Index", model);
+                }
+            }
+            else
+            {
+                model.ServerResult = "Access Token in certificate not valid, create new Access Token and copy Secret to busines details and try to reporting/clearance again";
+                return View("Index", model);
+            }
+        }
+
+        [HttpPost("reporting")]
+        public async Task<IActionResult> Reporting([FromForm] ApprovedInvoice model)
+        {
+            {
+                var testapi = await CheckMangerApiAsync(model.Referrer);
+
+                if (testapi)
+                {
+                    try
+                    {
+                        var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
+                        ZatcaRequestApi zatcaRequestApi = new()
+                        {
+                            Uuid = model.ZatcaUUID,
+                            InvoiceHash = model.InvoiceHash,
+                            Invoice = model.Base64SignedInvoice
+                        };
+
+                        var jsonContent = JsonConvert.SerializeObject(zatcaRequestApi);
+
+                        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
+                        _httpClient.DefaultRequestHeaders.Add("Clearance-Status", "0");
+                        _httpClient.DefaultRequestHeaders.Add("Accept-Version", "V2");
+                        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_certInfo.PCSIDBinaryToken}:{_certInfo.PCSIDSecret}")));
+
+                        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                        var response = await _httpClient.PostAsync(_certInfo.ReportingUrl, content);
+
+                        var resultContent = await response.Content.ReadAsStringAsync();
+
+                        if (response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.Accepted || response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                        {
+                            var apiResponse = JsonConvert.DeserializeObject<ServerResult>(resultContent);
+
+                            apiResponse ??= new ServerResult(); ;
+
+                            apiResponse.RequestUri = _certInfo.ReportingUrl;
+                            apiResponse.RequestType = "Invoice Reporting";
+                            apiResponse.StatusCode = $"{(int)response.StatusCode}-{response.StatusCode}";
+
+                            model.RequestType = apiResponse.RequestType;
+                            model.StatusCode = apiResponse.StatusCode;
+
+                            model.ApprovalStatus = apiResponse.ReportingStatus;
+
+                            model.EnvironmentType = _certInfo.EnvironmentType;
+
+                            model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
+                            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || apiResponse.ReportingStatus.Contains("NOT"))
+                            {
+                                model.ApprovalStatus = "REJECTED";
+                            }
+
+                            model.Timestamp = DateTime.Now;
+
+                            string approvalStatus = model.ApprovalStatus.Contains("NOT") ? "REJECTED" : model.ApprovalStatus;
+
+                            model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.ApprovedInvoiceGuid, approvalStatus);
+                            model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.ZatcaUUIDGuid, model.ZatcaUUID);
+
+                            if (!approvalStatus.Equals("REJECTED"))
+                            {
+                                model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.QrCodeGuid, model.Base64QrCode);
+                            }
+
+                            bool updateBusinessData = await ZatcaReference.UpdateReferenceFolder(_certInfo.ApiEndpoint, _certInfo.ApiSecret, model.ICV.ToString(), model.InvoiceHash);
+                            
+                            Console.WriteLine(updateBusinessData);
+                            
+                            if (updateBusinessData)
+                            {
+                                string sanitizedReference = new(model.Reference.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray());
+                                string fileName = $"{model.IssueDate}_{sanitizedReference}_{model.ZatcaUUID}.txt";
+
+                                string fileContent = await ZatcaReference.UpdateInvoice(_certInfo, model);
+
+                                TempData.Clear();
+                                TempData["StringFileContent"] = fileContent;
+                                TempData["StringFileName"] = fileName;
+                            }
+
+                        }
+                        else
+                        {
+                            var apiResponse = JsonConvert.DeserializeObject<ApiResponse>(resultContent);
+                            apiResponse.RequestUri = _certInfo.ClearanceUrl;
+
+                            model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        }
+
+                        return View("Index", model);
+                    }
+
+                    catch (Exception ex)
+                    {
+                        model.ServerResult = ex.Message;
+                        return View("Index", model);
+                    }
+                }
+                else
+                {
+                    model.ServerResult = "Access Token in certificate not valid, create new Access Token and copy Secret to busines details and try to reporting again";
+                    return View("Index", model);
+                }
+            }
+        }
+
+
+
+        //[HttpPost("clearance")]
+        //public async Task<IActionResult> Clearance([FromForm] ApprovedInvoice model)
+        //{
+        //    var testapi = await CheckMangerApiAsync(model.Referrer);
+        //    if (testapi)
+        //    {
+        //        try
+        //        {
+        //            var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
+        //            ZatcaRequestApi zatcaRequestApi = new()
+        //            {
+        //                Uuid = model.ZatcaUUID,
+        //                InvoiceHash = model.InvoiceHash,
+        //                Invoice = model.Base64SignedInvoice
+        //            };
+
+        //            var jsonContent = JsonConvert.SerializeObject(zatcaRequestApi);
+
+        //            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //            _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
+        //            _httpClient.DefaultRequestHeaders.Add("Clearance-Status", "1");
+        //            _httpClient.DefaultRequestHeaders.Add("Accept-Version", "V2");
+        //            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_certInfo.PCSIDBinaryToken}:{_certInfo.PCSIDSecret}")));
+
+        //            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+        //            var response = await _httpClient.PostAsync(_certInfo.ClearanceUrl, content);
+
+        //            var resultContent = await response.Content.ReadAsStringAsync();
+        //            var apiResponse = JsonConvert.DeserializeObject<ServerResult>(resultContent);
+
+        //            if (apiResponse != null && apiResponse.ClearedInvoice != null)
+        //            {
+        //                var clearedInvoiceXml = Encoding.UTF8.GetString(Convert.FromBase64String(apiResponse.ClearedInvoice));
+
+        //                model.Base64SignedInvoice = apiResponse.ClearedInvoice;
+
+        //                XmlSerializer serializer = new(typeof(Invoice));
+        //                using StringReader reader = new(clearedInvoiceXml);
+        //                var clearedInvoice = (Invoice)serializer.Deserialize(reader);
+
+        //                var qrCodeNode = clearedInvoice?.AdditionalDocumentReference?
+        //                    .FirstOrDefault(docRef => docRef.ID.Value == "QR")?.Attachment?.EmbeddedDocumentBinaryObject;
+
+        //                if (qrCodeNode != null)
+        //                {
+        //                    model.Base64QrCode = qrCodeNode.Value;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                apiResponse = new ServerResult();
+        //            }
+
+        //            apiResponse.RequestType = "Invoice Clearance";
+        //            apiResponse.StatusCode = $"{(int)response.StatusCode}-{response.StatusCode}";
+
+        //            model.RequestType = apiResponse.RequestType;
+        //            model.StatusCode = apiResponse.StatusCode;
+        //            model.ApprovalStatus = apiResponse.ClearanceStatus;
+        //            model.EnvironmentType = _certInfo.EnvironmentType;
+
+        //            model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
+        //            if (model.ApprovalStatus.Contains("CLEARED"))
+        //            {
+        //                model.Timestamp = DateTime.Now;
+
+        //                string approvalStatus = model.ApprovalStatus.Contains("NOT") ? "REJECTED" : model.ApprovalStatus;
+        //                model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.ApprovedInvoiceGuid, approvalStatus);
+        //                model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.ZatcaUUIDGuid, model.ZatcaUUID);
+
+        //                if (!approvalStatus.Equals("REJECTED"))
+        //                {
+        //                    model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.QrCodeGuid, model.Base64QrCode);
+        //                }
+
+        //                if (await ZatcaReference.UpdateReferenceFolder(_certInfo.ApiEndpoint, _certInfo.ApiSecret, model.ICV.ToString(), model.InvoiceHash))
+        //                {
+        //                    string sanitizedReference = new(model.Reference.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray());
+        //                    string fileName = $"{model.IssueDate}_{sanitizedReference}_{model.ZatcaUUID}.txt";
+
+        //                    string fileContent = await ZatcaReference.UpdateInvoice(_certInfo, model);
+
+        //                    TempData.Clear();
+        //                    TempData["StringFileContent"] = fileContent;
+        //                    TempData["StringFileName"] = fileName;
+        //                }
+
+        //            }
+
+        //            return View("Index", model);
+        //        }
+
+        //        catch (Exception ex)
+        //        {
+        //            model.ServerResult = ex.Message;
+        //            return View("Index", model);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        model.ServerResult = "Access Token in certificate not valid, create new Access Token and copy Secret to busines details and try to reporting/clearance again";
+        //        return View("Index", model);
+        //    }
+        //}
+
+        //[HttpPost("reporting")]
+        //public async Task<IActionResult> Reporting([FromForm] ApprovedInvoice model)
+        //{
+        //    {
+        //        var testapi = await CheckMangerApiAsync(model.Referrer);
+
+        //        if (testapi)
+        //        {
+        //            try
+        //            {
+        //                var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
+        //                ZatcaRequestApi zatcaRequestApi = new()
+        //                {
+        //                    Uuid = model.ZatcaUUID,
+        //                    InvoiceHash = model.InvoiceHash,
+        //                    Invoice = model.Base64SignedInvoice
+        //                };
+
+        //                var jsonContent = JsonConvert.SerializeObject(zatcaRequestApi);
+
+        //                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //                _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
+        //                _httpClient.DefaultRequestHeaders.Add("Clearance-Status", "0");
+        //                _httpClient.DefaultRequestHeaders.Add("Accept-Version", "V2");
+        //                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_certInfo.PCSIDBinaryToken}:{_certInfo.PCSIDSecret}")));
+
+        //                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+        //                var response = await _httpClient.PostAsync(_certInfo.ReportingUrl, content);
+
+        //                var resultContent = await response.Content.ReadAsStringAsync();
+        //                var apiResponse = JsonConvert.DeserializeObject<ServerResult>(resultContent);
+
+        //                apiResponse ??= new ServerResult();;
+
+        //                apiResponse.RequestType = "Invoice Reporting";
+        //                apiResponse.StatusCode = $"{(int)response.StatusCode}-{response.StatusCode}";
+
+        //                model.RequestType = apiResponse.RequestType;
+        //                model.StatusCode = apiResponse.StatusCode;
+
+        //                model.ApprovalStatus = apiResponse.ReportingStatus;
+
+        //                model.EnvironmentType = _certInfo.EnvironmentType;
+
+        //                model.ServerResult = JsonConvert.SerializeObject(apiResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
+        //                if (model.ApprovalStatus.Contains("REPORTED"))
+        //                {
+        //                    model.Timestamp = DateTime.Now;
+
+        //                    string approvalStatus = model.ApprovalStatus.Contains("NOT") ? "REJECTED" : model.ApprovalStatus;
+        //                    model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.ApprovedInvoiceGuid, approvalStatus);
+        //                    model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.ZatcaUUIDGuid, model.ZatcaUUID);
+
+        //                    if (!approvalStatus.Equals("REJECTED"))
+        //                    {
+        //                        model.EditData = JsonParser.ModifyStringInEditData(model.EditData, model.ManagerUUID, ManagerCustomField.QrCodeGuid, model.Base64QrCode);
+        //                    }
+
+        //                    if (await ZatcaReference.UpdateReferenceFolder(_certInfo.ApiEndpoint, _certInfo.ApiSecret, model.ICV.ToString(), model.InvoiceHash))
+        //                    {
+        //                        string sanitizedReference = new(model.Reference.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray());
+        //                        string fileName = $"{model.IssueDate}_{sanitizedReference}_{model.ZatcaUUID}.txt";
+
+        //                        string fileContent = await ZatcaReference.UpdateInvoice(_certInfo, model);
+
+        //                        TempData.Clear();
+        //                        TempData["StringFileContent"] = fileContent;
+        //                        TempData["StringFileName"] = fileName;
+        //                    }
+
+        //                }
+
+        //                return View("Index", model);
+        //            }
+
+        //            catch (Exception ex)
+        //            {
+        //                model.ServerResult = ex.Message;
+        //                return View("Index", model);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            model.ServerResult = "Access Token in certificate not valid, create new Access Token and copy Secret to busines details and try to reporting again";
+        //            return View("Index", model);
+        //        }
+        //    }
+        //}
+
+        private async Task<bool> CheckMangerApiAsync(string Referrer)
+        {
+            try
+            {
+                var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
+                var apiUrl = UrlHelper.CheckApiUrl(Referrer);
+
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("X-API-KEY", _certInfo.ApiSecret);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var response = await client.GetAsync(apiUrl);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+    }
+}
+
+
+

@@ -1,0 +1,434 @@
+{
+  "jsondata": [
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000000",
+        "Name": "Access Token Secret",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "38cf4712-6e95-4ce1-b53a-bff03edad273"
+        ],
+        "Position": 100,
+        "ShowAtTheTop": false,
+        "Size": "Large",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000001",
+        "Name": "Zatca Certificate Info",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "38cf4712-6e95-4ce1-b53a-bff03edad273"
+        ],
+        "Position": 101,
+        "ShowAtTheTop": false,
+        "Size": "Large",
+        "Type": "ParagraphText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000002",
+        "Name": "Last ICV",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          //"38cf4712-6e95-4ce1-b53a-bff03edad273",
+          "5d6fae1e-ff34-4870-80e9-8a755842d46e"
+        ],
+        "Position": 102,
+        "ShowAtTheTop": false,
+        "Size": "Small",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000003",
+        "Name": "Last PIH",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          //"38cf4712-6e95-4ce1-b53a-bff03edad273",
+          "5d6fae1e-ff34-4870-80e9-8a755842d46e"
+        ],
+        "Position": 103,
+        "ShowAtTheTop": false,
+        "Size": "Large",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000004",
+        "Name": "Street Name",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee",
+          "6d2dc48d-2053-4e45-8330-285ebd431242"
+        ],
+        "Position": 104,
+        "ShowAtTheTop": false,
+        "Size": "Large",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000005",
+        "Name": "Building Number",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee",
+          "6d2dc48d-2053-4e45-8330-285ebd431242"
+        ],
+        "Position": 105,
+        "ShowAtTheTop": false,
+        "Size": "Small",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000006",
+        "Name": "City Subdivision Name",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee",
+          "6d2dc48d-2053-4e45-8330-285ebd431242"
+        ],
+        "Position": 106,
+        "ShowAtTheTop": false,
+        "Size": "Large",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000007",
+        "Name": "City Name",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee",
+          "6d2dc48d-2053-4e45-8330-285ebd431242"
+        ],
+        "Position": 107,
+        "ShowAtTheTop": false,
+        "Size": "Large",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000008",
+        "Name": "Postal Zone",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee",
+          "6d2dc48d-2053-4e45-8330-285ebd431242"
+        ],
+        "Position": 108,
+        "ShowAtTheTop": false,
+        "Size": "Small",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000009",
+        "Name": "Country Code",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee",
+          "6d2dc48d-2053-4e45-8330-285ebd431242"
+        ],
+        "Position": 109,
+        "ShowAtTheTop": false,
+        "Size": "Small",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000010",
+        "Name": "Company ID",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee",
+          "6d2dc48d-2053-4e45-8330-285ebd431242"
+        ],
+        "Position": 110,
+        "ShowAtTheTop": false,
+        "Size": "Medium",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000011",
+        "Name": "Tax SchemeID",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee",
+          "6d2dc48d-2053-4e45-8330-285ebd431242"
+        ],
+        "Position": 111,
+        "ShowAtTheTop": false,
+        "Size": "Small",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000012",
+        "Name": "Registration Name",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ec37c11e-2b67-49c6-8a58-6eccb7dd75ee",
+          "6d2dc48d-2053-4e45-8330-285ebd431242"
+        ],
+        "Position": 112,
+        "ShowAtTheTop": false,
+        "Size": "Large",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "Description": null,
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000013",
+        "Name": "Invoice SubType",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ad12b60b-23bf-4421-94df-8be79cef533e",
+          "274fc6d0-2eac-43d0-8286-79c856e644aa",
+          "245e5943-0092-409d-96ae-e2ee10eac75b",
+          "58b9eb90-f6b8-4abc-8ea1-12fd77b8336e"
+        ],
+        "Position": 113,
+        "ShowAtTheTop": false,
+        "Size": "Small",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "Description": null,
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000014",
+        "Name": "Payment Means Code",
+        "OptionsForDropdownList": "10 | In cash\n30 | Credit\n42 | Payment to bank account\n48 | Bank card\n1 | Instrument not defined (Free text)",
+        "Placement": [
+          "ad12b60b-23bf-4421-94df-8be79cef533e",
+          "274fc6d0-2eac-43d0-8286-79c856e644aa",
+          "245e5943-0092-409d-96ae-e2ee10eac75b",
+          "58b9eb90-f6b8-4abc-8ea1-12fd77b8336e"
+        ],
+        "Position": 114,
+        "ShowAtTheTop": false,
+        "Size": "Large",
+        "Type": "DropdownList"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "Description": null,
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000015",
+        "Name": "Instruction Note",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "245e5943-0092-409d-96ae-e2ee10eac75b",
+          "274fc6d0-2eac-43d0-8286-79c856e644aa"
+        ],
+        "Position": 115,
+        "ShowAtTheTop": false,
+        "Size": "Large",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "Description": "<div id=\"ApprovalInput\" style=\"display: none;\"><script>document.addEventListener('DOMContentLoaded',()=>{const labelText='Approval Status';const CustomFieldGuid='a1b2c3d4-e5f6-4abc-8def-abcdef000016';const vModelForm=document.getElementById('v-model-form');if(vModelForm){const labels=vModelForm.querySelectorAll('label');labels.forEach(label=>{if(label.textContent.trim()===labelText){const formGroup=label.closest('.form-group');if(formGroup){const inputs=formGroup.querySelectorAll('input');inputs.forEach(input=>{input.readOnly=true});const updateButton=document.querySelector('button.btn.btn-success[onclick=\"ajaxPost(true)\"]');if(!updateButton){app.CustomFields2.Strings[CustomFieldGuid]=null;inputs.forEach(input=>{input.value=null})}}}})}const selfDeletingContainer=document.getElementById('ApprovalInput');if(selfDeletingContainer){selfDeletingContainer.remove()}});</script>\n</div>",
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000016",
+        "Name": "Approval Status",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ad12b60b-23bf-4421-94df-8be79cef533e",
+          "274fc6d0-2eac-43d0-8286-79c856e644aa",
+          "245e5943-0092-409d-96ae-e2ee10eac75b",
+          "58b9eb90-f6b8-4abc-8ea1-12fd77b8336e"
+        ],
+        "Position": 116,
+        "ShowAtTheTop": false,
+        "Size": "Medium",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "Description": "<div id=\"UUIDInput\" style=\"display: none;\"><script>document.addEventListener('DOMContentLoaded',()=>{const labelText='Zatca UUID';const CustomFieldGuid='a1b2c3d4-e5f6-4abc-8def-abcdef000017';const vModelForm=document.getElementById('v-model-form');if(vModelForm){const labels=vModelForm.querySelectorAll('label');labels.forEach(label=>{if(label.textContent.trim()===labelText){const formGroup=label.closest('.form-group');if(formGroup){const inputs=formGroup.querySelectorAll('input');inputs.forEach(input=>{input.readOnly=true});const updateButton=document.querySelector('button.btn.btn-success[onclick=\"ajaxPost(true)\"]');if(!updateButton){app.CustomFields2.Strings[CustomFieldGuid]=null;inputs.forEach(input=>{input.value=null})}}}})}const selfDeletingContainer=document.getElementById('UUIDInput');if(selfDeletingContainer){selfDeletingContainer.remove()}});</script>\n</div>",
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000017",
+        "Name": "Zatca UUID",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ad12b60b-23bf-4421-94df-8be79cef533e",
+          "274fc6d0-2eac-43d0-8286-79c856e644aa",
+          "245e5943-0092-409d-96ae-e2ee10eac75b",
+          "58b9eb90-f6b8-4abc-8ea1-12fd77b8336e"
+        ],
+        "Position": 117,
+        "ShowAtTheTop": false,
+        "Size": "Medium",
+        "Type": "SingleLineText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "Description": "<div id=\"QrCodeTextarea\" style=\"display: none;\">  <script>  document.addEventListener('DOMContentLoaded', () => {  const labelText = 'Base64 QRCode';  const CustomFieldGuid = 'a1b2c3d4-e5f6-4abc-8def-abcdef000018';  const vModelForm = document.getElementById('v-model-form');  if (vModelForm) {  const labels = vModelForm.querySelectorAll('label');  labels.forEach(label => {  if (label.textContent.trim() === labelText) {  const formGroup = label.closest('.form-group');  if (formGroup) {  const inputs = formGroup.querySelectorAll('textarea');  const updateButton = document.querySelector('button.btn.btn-success[onclick=\"ajaxPost(true)\"]');  inputs.forEach(input => {  input.readOnly = true;  if (input.value.length > 100) {  if (updateButton) {  updateButton.disabled = true;  }  }  });  if (!updateButton) {  app.CustomFields2.Strings[CustomFieldGuid] = null;  inputs.forEach(input => {  input.value = null;  });  }  }  }  });  }  const selfDeletingContainer = document.getElementById('QrCodeTextarea');  if (selfDeletingContainer) {  selfDeletingContainer.remove();  }  });  </script>  </div>",
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000018",
+        "Name": "Base64 QRCode",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ad12b60b-23bf-4421-94df-8be79cef533e",
+          "274fc6d0-2eac-43d0-8286-79c856e644aa",
+          "245e5943-0092-409d-96ae-e2ee10eac75b",
+          "58b9eb90-f6b8-4abc-8ea1-12fd77b8336e"
+        ],
+        "Position": 118,
+        "ShowAtTheTop": false,
+        "Size": "Large",
+        "Type": "ParagraphText"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "Description": null,
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000019",
+        "Name": "Tax Category Info",
+        "OptionsForDropdownList": "S\nE | VATEX-SA-29\nE | VATEX-SA-29-7\nE | VATEX-SA-30\nE | VATEX-SA-DUTYFREE\nZ | VATEX-SA-32\nZ | VATEX-SA-33\nZ | VATEX-SA-34-1\nZ | VATEX-SA-34-2\nZ | VATEX-SA-34-3\nZ | VATEX-SA-34-4\nZ | VATEX-SA-34-5\nZ | VATEX-SA-35\nZ | VATEX-SA-36\nZ | VATEX-SA-EDU\nZ | VATEX-SA-HEA\nZ | VATEX-SA-MLTRY\nO | VATEX-SA-OOS",
+        "Placement": [
+          "0dbdbf8a-d80c-48e6-b453-bb7862445b7c",
+          "7affe9ee-731f-4936-8acf-15cae7bcacee",
+          "efc4f2cc-acf0-4815-a9a8-13bae00c6167"
+        ],
+        "Position": 119,
+        "ShowAtTheTop": false,
+        "Size": "Medium",
+        "Type": "DropdownList"
+      }
+    },
+    {
+      "apipath": "/sales-invoice-footer-form",
+      "data": {
+        "Content": "<script src=\"resources/qrcode/qrcode.js\"></script><script id=\"qrCodeFooter\">document.onreadystatechange=function(){if(document.readyState==\"complete\"){var qrCodeContent='%%Base64 QRCode%%';function parseQRCodeContent(qrCodeBase64){let details=new Map();try{let data=atob(qrCodeBase64.replace(/\\+/g,'+'));let index=0;while(index<data.length){let tag=data.charCodeAt(index++);let length=data.charCodeAt(index++);let value=data.substr(index,length);index+=length;let decodedValue=(tag===8||tag===9)?[...value].map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join(' ').toUpperCase():new TextDecoder('utf-8').decode(new Uint8Array([...value].map(c=>c.charCodeAt(0))));details.set(tag,[decodedValue])}}catch(ex){console.error(\"Error decoding QR code: \"+ex.message)}return details}function findParentTable(element){while(element){if(element.tagName==='TABLE')return element;element=element.parentElement}return null}function insertQRCode(qrCodeContent){const qrCodeCell=document.getElementById('qrcodecell');const qrCodeFooterDiv=document.getElementById('qrCodeFooter');if(qrCodeCell){qrCodeCell.innerHTML='<div id=\"signedQrCode\" style=\"padding: 20px\"></div>';renderQRCode(qrCodeContent,'signedQrCode')}else if(qrCodeContent&&qrCodeContent.length>10){const mainTable=findParentTable(qrCodeFooterDiv);if(!mainTable){console.error('Parent table not found for the QR code.');return}const newRow=mainTable.insertRow();const newCell=newRow.insertCell();newCell.colSpan=99;newCell.innerHTML='<div id=\"signedQrCode\" style=\"padding: 20px\"></div>';renderQRCode(qrCodeContent,'signedQrCode')}removeElementById('qrcode')}function renderQRCode(content,elementId){new QRCode(document.getElementById(elementId),{text:content,width:160,height:160,colorDark:\"#000000\",colorLight:\"#fafafa\",correctLevel:QRCode.CorrectLevel.L});let details=parseQRCodeContent(content);if(details.size>0){let title=Array.from(details).map(([tag,value])=>`Tag ${tag} : ${value.join(', ')}`).join('\\n');const qrCodeDiv=document.getElementById(elementId);if(qrCodeDiv){qrCodeDiv.title=title.trim()}}}function removeElementById(id){const element=document.getElementById(id);if(element)element.remove()}insertQRCode(qrCodeContent);}}</script>",
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000901",
+        "Name": "QrCodePhaseII"
+      }
+    },
+    {
+      "apipath": "/purchase-invoice-footer-form",
+      "data": {
+        "Content": "<script src=\"resources/qrcode/qrcode.js\"></script><script id=\"qrCodeFooter\">document.onreadystatechange=function(){if(document.readyState==\"complete\"){var qrCodeContent='%%Base64 QRCode%%';function parseQRCodeContent(qrCodeBase64){let details=new Map();try{let data=atob(qrCodeBase64.replace(/\\+/g,'+'));let index=0;while(index<data.length){let tag=data.charCodeAt(index++);let length=data.charCodeAt(index++);let value=data.substr(index,length);index+=length;let decodedValue=(tag===8||tag===9)?[...value].map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join(' ').toUpperCase():new TextDecoder('utf-8').decode(new Uint8Array([...value].map(c=>c.charCodeAt(0))));details.set(tag,[decodedValue])}}catch(ex){console.error(\"Error decoding QR code: \"+ex.message)}return details}function findParentTable(element){while(element){if(element.tagName==='TABLE')return element;element=element.parentElement}return null}function insertQRCode(qrCodeContent){const qrCodeCell=document.getElementById('qrcodecell');const qrCodeFooterDiv=document.getElementById('qrCodeFooter');if(qrCodeCell){qrCodeCell.innerHTML='<div id=\"signedQrCode\" style=\"padding: 20px\"></div>';renderQRCode(qrCodeContent,'signedQrCode')}else if(qrCodeContent&&qrCodeContent.length>10){const mainTable=findParentTable(qrCodeFooterDiv);if(!mainTable){console.error('Parent table not found for the QR code.');return}const newRow=mainTable.insertRow();const newCell=newRow.insertCell();newCell.colSpan=99;newCell.innerHTML='<div id=\"signedQrCode\" style=\"padding: 20px\"></div>';renderQRCode(qrCodeContent,'signedQrCode')}removeElementById('qrcode')}function renderQRCode(content,elementId){new QRCode(document.getElementById(elementId),{text:content,width:160,height:160,colorDark:\"#000000\",colorLight:\"#fafafa\",correctLevel:QRCode.CorrectLevel.L});let details=parseQRCodeContent(content);if(details.size>0){let title=Array.from(details).map(([tag,value])=>`Tag ${tag} : ${value.join(', ')}`).join('\\n');const qrCodeDiv=document.getElementById(elementId);if(qrCodeDiv){qrCodeDiv.title=title.trim()}}}function removeElementById(id){const element=document.getElementById(id);if(element)element.remove()}insertQRCode(qrCodeContent);}}</script>",
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000902",
+        "Name": "QrCodePhaseII"
+      }
+    },
+    {
+      "apipath": "/credit-note-footer-form",
+      "data": {
+        "Content": "<script src=\"resources/qrcode/qrcode.js\"></script><script id=\"qrCodeFooter\">document.onreadystatechange=function(){if(document.readyState==\"complete\"){var qrCodeContent='%%Base64 QRCode%%';function parseQRCodeContent(qrCodeBase64){let details=new Map();try{let data=atob(qrCodeBase64.replace(/\\+/g,'+'));let index=0;while(index<data.length){let tag=data.charCodeAt(index++);let length=data.charCodeAt(index++);let value=data.substr(index,length);index+=length;let decodedValue=(tag===8||tag===9)?[...value].map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join(' ').toUpperCase():new TextDecoder('utf-8').decode(new Uint8Array([...value].map(c=>c.charCodeAt(0))));details.set(tag,[decodedValue])}}catch(ex){console.error(\"Error decoding QR code: \"+ex.message)}return details}function findParentTable(element){while(element){if(element.tagName==='TABLE')return element;element=element.parentElement}return null}function insertQRCode(qrCodeContent){const qrCodeCell=document.getElementById('qrcodecell');const qrCodeFooterDiv=document.getElementById('qrCodeFooter');if(qrCodeCell){qrCodeCell.innerHTML='<div id=\"signedQrCode\" style=\"padding: 20px\"></div>';renderQRCode(qrCodeContent,'signedQrCode')}else if(qrCodeContent&&qrCodeContent.length>10){const mainTable=findParentTable(qrCodeFooterDiv);if(!mainTable){console.error('Parent table not found for the QR code.');return}const newRow=mainTable.insertRow();const newCell=newRow.insertCell();newCell.colSpan=99;newCell.innerHTML='<div id=\"signedQrCode\" style=\"padding: 20px\"></div>';renderQRCode(qrCodeContent,'signedQrCode')}removeElementById('qrcode')}function renderQRCode(content,elementId){new QRCode(document.getElementById(elementId),{text:content,width:160,height:160,colorDark:\"#000000\",colorLight:\"#fafafa\",correctLevel:QRCode.CorrectLevel.L});let details=parseQRCodeContent(content);if(details.size>0){let title=Array.from(details).map(([tag,value])=>`Tag ${tag} : ${value.join(', ')}`).join('\\n');const qrCodeDiv=document.getElementById(elementId);if(qrCodeDiv){qrCodeDiv.title=title.trim()}}}function removeElementById(id){const element=document.getElementById(id);if(element)element.remove()}insertQRCode(qrCodeContent);}}</script>",
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000903",
+        "Name": "QrCodePhaseII"
+      }
+    },
+    {
+      "apipath": "/debit-note-footer-form",
+      "data": {
+        "Content": "<script src=\"resources/qrcode/qrcode.js\"></script><script id=\"qrCodeFooter\">document.onreadystatechange=function(){if(document.readyState==\"complete\"){var qrCodeContent='%%Base64 QRCode%%';function parseQRCodeContent(qrCodeBase64){let details=new Map();try{let data=atob(qrCodeBase64.replace(/\\+/g,'+'));let index=0;while(index<data.length){let tag=data.charCodeAt(index++);let length=data.charCodeAt(index++);let value=data.substr(index,length);index+=length;let decodedValue=(tag===8||tag===9)?[...value].map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join(' ').toUpperCase():new TextDecoder('utf-8').decode(new Uint8Array([...value].map(c=>c.charCodeAt(0))));details.set(tag,[decodedValue])}}catch(ex){console.error(\"Error decoding QR code: \"+ex.message)}return details}function findParentTable(element){while(element){if(element.tagName==='TABLE')return element;element=element.parentElement}return null}function insertQRCode(qrCodeContent){const qrCodeCell=document.getElementById('qrcodecell');const qrCodeFooterDiv=document.getElementById('qrCodeFooter');if(qrCodeCell){qrCodeCell.innerHTML='<div id=\"signedQrCode\" style=\"padding: 20px\"></div>';renderQRCode(qrCodeContent,'signedQrCode')}else if(qrCodeContent&&qrCodeContent.length>10){const mainTable=findParentTable(qrCodeFooterDiv);if(!mainTable){console.error('Parent table not found for the QR code.');return}const newRow=mainTable.insertRow();const newCell=newRow.insertCell();newCell.colSpan=99;newCell.innerHTML='<div id=\"signedQrCode\" style=\"padding: 20px\"></div>';renderQRCode(qrCodeContent,'signedQrCode')}removeElementById('qrcode')}function renderQRCode(content,elementId){new QRCode(document.getElementById(elementId),{text:content,width:160,height:160,colorDark:\"#000000\",colorLight:\"#fafafa\",correctLevel:QRCode.CorrectLevel.L});let details=parseQRCodeContent(content);if(details.size>0){let title=Array.from(details).map(([tag,value])=>`Tag ${tag} : ${value.join(', ')}`).join('\\n');const qrCodeDiv=document.getElementById(elementId);if(qrCodeDiv){qrCodeDiv.title=title.trim()}}}function removeElementById(id){const element=document.getElementById(id);if(element)element.remove()}insertQRCode(qrCodeContent);}}</script>",
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000904",
+        "Name": "QrCodePhaseII"
+      }
+    },
+    {
+      "apipath": "/folder-form",
+      "data": {
+        "Description": "ZatcaReference",
+        "CustomFields": {},
+        "CustomFields2": {
+          "Strings": {
+            "a1b2c3d4-e5f6-4abc-8def-abcdef000002": "0",
+            "a1b2c3d4-e5f6-4abc-8def-abcdef000003": "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ=="
+          },
+          "Decimals": {},
+          "Dates": {},
+          "Booleans": {},
+          "StringArrays": {}
+        },
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000909"
+      }
+    }
+  ]
+}

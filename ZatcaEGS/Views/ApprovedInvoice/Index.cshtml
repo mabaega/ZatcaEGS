@@ -1,0 +1,202 @@
+﻿@model List<ZatcaEGS.Models.ApprovedInvoice>
+@{
+    ViewData["Title"] = "Approved Invoices";
+}
+
+<div class="bg-body-tertiary rounded text-center">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Approved Invoices</h4>
+        </div>
+        <div class="card-body">
+            <table id="datatable" class="table table-bordered table-striped nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Invoice UUID</th>
+                        <th>Invoice Type</th>
+                        <th>Invoice SubType</th>
+                        <th>Reference</th>
+                        <th>Issue Date</th>
+                        <th>Party Name</th>
+                        <th>Currency Code</th>
+                        <th>Amount</th>
+                        <th>Tax Amount</th>
+                        <th>Total Amount</th>
+                        <th>ICV</th>
+                        <th>Request Type</th>
+                        <td>Approval Status</td>
+                        @* <th>Clearance Status</th>
+                        <th>Reporting Status</th> *@
+                        <th>Result</th>
+                        <th style="display: none;">ServerResult</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.ManagerUUID</td>
+                            <td>@item.InvoiceType</td>
+                            <td>@item.InvoiceSubType</td>
+                            <td>@item.Reference</td>
+                            <td>@item.IssueDate</td>
+                            <td>@item.PartyName</td>
+                            <td>@item.CurrencyCode</td>
+                            <td>@item.Amount.ToString("N2")</td>
+                            <td>@item.TaxAmount.ToString("N2")</td>
+                            <td>@item.TotalAmount.ToString("N2")</td>
+                            <td>@item.ICV</td>
+                            <td>@item.RequestType</td>
+                            <td>@item.ApprovalStatus</td>
+                            @* <td>@item.ClearanceStatus</td>
+                            <td>@item.ReportingStatus</td> *@
+                            <td><a href="#" class="viewResult"><i class="fa fa-file-text"></i></a></td>
+                            <td style="display: none;">@item.ServerResult</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal modal-lg fade" id="dataModal" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dataModalLabel">Reporting/Clearance Result</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="mb-3">
+                    <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Invoice UUID</span>
+                        <input type="text" id="modalInvoiceUUID" class="form-control" aria-label="Invoice UUID" aria-describedby="inputGroup-sizing-sm" readonly>
+                    </div>
+                    <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Reference</span>
+                        <input type="text" id="modalReference" class="form-control" aria-label="Reference" aria-describedby="inputGroup-sizing-sm" readonly>
+                    </div>
+                    <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Issue Date</span>
+                        <input type="text" id="modalIssueDate" class="form-control" aria-label="Issue Date" aria-describedby="inputGroup-sizing-sm" readonly>
+                    </div>
+                </div>
+
+                <textarea id="modalTextarea" class="form-control" rows="20" readonly wrap="off" style="margin-top: 10px; min-height: 200px;"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.js"></script>
+
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.bootstrap5.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.colVis.min.js"></script>
+
+@section scripts {
+    <script>
+        $(function () {
+            var mainDiv = document.getElementById('maindiv');
+            mainDiv.classList.remove('align-items-center');
+
+            var table = $('#datatable').DataTable({
+                scrollX: true,
+                "pagingType": "simple_numbers",
+                "lengthMenu": [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
+                responsive: true,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search records",
+                },
+                "columnDefs": [
+                    { "targets": [2, 3, 4, 6, 10, 11, 12, 13], "className": "text-center" },
+                    { "targets": [7, 8, 9], "className": "text-end" },
+                    { "targets": [14], "visible": false } 
+                ],
+                layout: {
+                    topStart: 'search',
+                    topEnd: {
+                        buttons: [
+                            {
+                                extend: 'pageLength',
+                            },
+                            {
+                                extend: 'copyHtml5',
+                                text: '<i class="fa fa-files-o"></i>',
+                                titleAttr: 'Copy',
+                                exportOptions: {
+                                    columns: ':not(:eq(13), :eq(14))'
+                                }
+                            },
+                            {
+                                extend: 'excelHtml5',
+                                text: '<i class="fa fa-file-excel-o"></i>',
+                                titleAttr: 'Excel',
+                                exportOptions: {
+                                    columns: ':not(:eq(13), :eq(14))'
+                                }
+                            },
+                            // {
+                            //     extend: 'pdfHtml5',
+                            //     text: '<i class="fa fa-file-pdf-o"></i>',
+                            //     titleAttr: 'PDF',
+                            //     orientation: 'landscape',
+                            //     customize: function (doc) {
+                            //         doc.defaultStyle.font = 'Arial';
+                            //     },
+                            //     exportOptions: {
+                            //         columns: ':not(:eq(13), :eq(14))'
+                            //     }
+                            // }
+                        ]
+                    },
+                },
+                initComplete: function () {
+                    $('.btn-secondary').each(function () {
+                        $(this).removeClass('btn-secondary');
+                    });
+                }
+            });
+
+            $('#datatable').on('click', '.viewResult', function (e) {
+                e.preventDefault();
+
+                var $tr = $(this).closest('tr');
+                var data = $('#datatable').DataTable().row($tr).data();
+                var serverResult = data[14]; 
+
+                try {
+                    var formattedJSON = JSON.stringify(JSON.parse(serverResult), null, 4);
+                } catch (error) {
+                    var formattedJSON = "Invalid JSON format";
+                }
+
+                $('#modalInvoiceUUID').val(data[0]); 
+                $('#modalReference').val(data[3]);   
+                $('#modalIssueDate').val(data[4]);  
+                $('#modalTextarea').val(formattedJSON);
+                $('#dataModal').modal('show');
+            });
+
+        });
+    </script>
+}
