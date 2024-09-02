@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
@@ -9,8 +9,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>24.09.02.0008</AssemblyVersion>
-    <FileVersion>24.09.02.0008</FileVersion>
+    <AssemblyVersion>24.09.02.0010</AssemblyVersion>
+    <FileVersion>24.09.02.0010</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="cfData.json" />
