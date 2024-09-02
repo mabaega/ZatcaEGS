@@ -9,8 +9,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>24.09.02.0010</AssemblyVersion>
-    <FileVersion>24.09.02.0010</FileVersion>
+    <AssemblyVersion>24.09.02.0011</AssemblyVersion>
+    <FileVersion>24.09.02.0011</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="cfData.json" />
