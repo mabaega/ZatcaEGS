@@ -12,8 +12,7 @@ ZatcaEGS (Zatca eInvoice Generation System) is an application designed to integr
 
 Watch the demonstration of the project:
 
-[Watch the video](https://youtu.be/2wVFRToLTO0)
+[Watch the video]([https://youtu.be/2wVFRToLTO0](https://youtu.be/9RXJMl2J9J4))
 
 Or click the image below to watch at a specific time:
 
-[![Watch the video](https://img.youtube.com/vi/2wVFRToLTO0/0.jpg)](https://youtu.be/2wVFRToLTO0?t=0)
