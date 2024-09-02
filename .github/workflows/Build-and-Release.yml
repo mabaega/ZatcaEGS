@@ -1,78 +1,76 @@
-name: Build and Release
+name: Release
 
 on:
-  workflow_dispatch:  # Allows manual triggering of the workflow
+  workflow_dispatch:
 
 jobs:
-  build:
+  create_release:
     runs-on: ubuntu-latest
-
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+      - name: Get Version
+        id: get_version
+        run: |
+          VERSION=$(grep -oP '(?<=<AssemblyVersion>).*(?=</AssemblyVersion>)' Zatca.EGS/Zatca.EGS.csproj)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: Release ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
 
-    - name: Set up .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.0.x'  # Replace with your .NET version
-
-    - name: Restore NuGet packages
-      run: dotnet restore
-
-    - name: Build and Publish for Multiple Runtimes
-      run: |
-        targets=("linux-x64" "win-x64" "osx-x64")
-        for target in "${targets[@]}"; do
-            dotnet publish -c Release -r $target --self-contained false -o ./publish/$target
-        done
-
-    - name: Create ZIP Files
-      run: |
-        cd publish/linux-x64
-        zip -r ZatcaEGS-linux-x64.zip .
-        cd ../win-x64
-        zip -r ZatcaEGS-win-x64.zip .
-        cd ../osx-x64
-        zip -r ZatcaEGS-osx-x64.zip .
-        cd ..
-
-    - name: Get Version from csproj
-      id: get_version
-      run: |
-        VERSION=$(grep -oPm1 "(?<=<AssemblyVersion>)[^<]+" ZatcaEGS/Zatca.EGS/Zatca.EGS.csproj)
-        echo "VERSION=${VERSION}" >> $GITHUB_ENV
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      with:
-        tag_name: v${{ env.VERSION }}
-        release_name: Release ${{ env.VERSION }}
-        body: |
-          Release for version ${{ env.VERSION }}
-        draft: false
-        prerelease: false
-
-    - name: Upload Linux Asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./publish/linux-x64/ZatcaEGS-linux-x64.zip
-        asset_name: ZatcaEGS-linux-x64.zip
-        asset_content_type: application/zip
-
-    - name: Upload Windows Asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./publish/win-x64/ZatcaEGS-win-x64.zip
-        asset_name: ZatcaEGS-win-x64.zip
-        asset_content_type: application/zip
-
-    - name: Upload macOS Asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./publish/osx-x64/ZatcaEGS-osx-x64.zip
-        asset_name: ZatcaEGS-osx-x64.zip
-        asset_content_type: application/zip
+  build:
+    needs: create_release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            output_name: ZatcaEGS-linux
+            runtime: linux-x64
+          - os: windows-latest
+            output_name: ZatcaEGS-windows
+            runtime: win-x64
+          - os: macos-latest
+            output_name: ZatcaEGS-macos
+            runtime: osx-x64
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore dependencies
+        run: dotnet restore Zatca.EGS/Zatca.EGS.csproj
+      - name: Build
+        run: dotnet build Zatca.EGS/Zatca.EGS.csproj --configuration Release --no-restore
+      - name: Publish
+        run: dotnet publish Zatca.EGS/Zatca.EGS.csproj -c Release -o ./publish -r ${{ matrix.runtime }} --self-contained true
+      - name: Zip Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          filename: ${{ matrix.output_name }}.zip
+          directory: ./publish
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./publish/${{ matrix.output_name }}.zip
+          asset_name: ${{ matrix.output_name }}.zip
+          asset_content_type: application/zip
