@@ -2,11 +2,11 @@
 
 ZatcaEGS (Zatca eInvoice Generation System) is an application designed to integrate Manager IO with Fatoora Zatca eInvoice. This application aims to simplify the process of creating and reporting eInvoices.
 
-![Latest Pre-Release](https://img.shields.io/github/v/release/mabaega/ZatcaEGS?include_prereleases)
+![Latest Release](https://img.shields.io/github/v/release/mabaega/ZatcaEGS)
 
 ## Latest Release
 
-[View Latest Pre-Release](https://github.com/mabaega/ZatcaEGS/releases/latest)
+[View Latest Release](https://github.com/mabaega/ZatcaEGS/releases/latest)
 
 ## Video Demonstration
 
