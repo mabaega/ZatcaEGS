@@ -51,6 +51,10 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
+      - name: Display .NET Information
+        run: dotnet --info
+      - name: List Directory Contents
+        run: ls -R
       - name: Restore dependencies
         run: dotnet restore Zatca.EGS/Zatca.EGS.csproj
       - name: Build
@@ -68,3 +72,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${{ needs.create_release.outputs.version }} ./publish/${{ matrix.output_name }}.zip
+      - name: Upload logs if failed
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-logs-${{ matrix.os }}
+          path: |
+            **/*.log
+            **/*.trx
