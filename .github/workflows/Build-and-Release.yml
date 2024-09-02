@@ -14,15 +14,13 @@ jobs:
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.x.x' # Replace with your .NET version
+        dotnet-version: '8.x.x'  # Replace with your .NET version
 
-    - name: Update Project Version
-      run: |
-        pwsh ./Zatca.EGS/UpdateVersion.ps1 # Path to your PowerShell script
+    - name: Restore NuGet packages
+      run: dotnet restore
 
     - name: Build and Publish for Multiple Runtimes
       run: |
-        # Build and publish for each target runtime
         targets=("linux-x64" "win-x64" "osx-x64")
         for target in "${targets[@]}"; do
             dotnet publish -c Release -r $target --self-contained false -o ./publish/$target
@@ -38,14 +36,20 @@ jobs:
         zip -r ZatcaEGS-osx-x64.zip .
         cd ..
 
+    - name: Get Version from csproj
+      id: get_version
+      run: |
+        VERSION=$(grep -oPm1 "(?<=<AssemblyVersion>)[^<]+" Zatca.EGS.csproj)
+        echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: v${{ env.VERSION }}
+        release_name: Release ${{ env.VERSION }}
         body: |
-          Release for ${{ github.ref }}
+          Release for version ${{ env.VERSION }}
         draft: false
         prerelease: false
 
