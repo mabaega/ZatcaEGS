@@ -19,9 +19,6 @@ jobs:
         dotnet-version: '8.x.x' # Replace with your .NET version
 
     - name: Update Project Version
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.x.x' # Replace with your .NET version
       run: |
         pwsh ./Zatca.EGS/UpdateVersion.ps1 # Path to your PowerShell script
 
