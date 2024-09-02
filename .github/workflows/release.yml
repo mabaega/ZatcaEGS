@@ -10,6 +10,7 @@ jobs:
       contents: write
     outputs:
       version: ${{ steps.get_version.outputs.version }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup .NET
@@ -22,16 +23,21 @@ jobs:
           VERSION=$(grep -oP '(?<=<AssemblyVersion>).*(?=</AssemblyVersion>)' Zatca.EGS/Zatca.EGS.csproj)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create ${{ steps.get_version.outputs.version }} \
-            --title "Release ${{ steps.get_version.outputs.version }}" \
-            --generate-notes
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: Release ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
 
   build:
     needs: create_release
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -68,10 +74,14 @@ jobs:
           filename: ${{ matrix.output_name }}.zip
           directory: ./publish
       - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload ${{ needs.create_release.outputs.version }} ./publish/${{ matrix.output_name }}.zip
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./publish/${{ matrix.output_name }}.zip
+          asset_name: ${{ matrix.output_name }}.zip
+          asset_content_type: application/zip
       - name: Upload logs if failed
         if: failure()
         uses: actions/upload-artifact@v2
