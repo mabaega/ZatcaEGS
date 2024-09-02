@@ -365,3 +365,5 @@ FodyWeavers.xsd
 /EGS/EGS.csproj
 /ConsoleApp1/ConsoleApp1.csproj
 /CFGenerator/CFGenerator.csproj
+/.github/workflows/Build-and-Release.yml
+/.github/workflows/release.yml
