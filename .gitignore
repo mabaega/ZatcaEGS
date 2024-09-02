@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/ZatcaEGS/ZatcaEGS.csproj
+/EGS/EGS.csproj
+/ConsoleApp1/ConsoleApp1.csproj
+/CFGenerator/CFGenerator.csproj
