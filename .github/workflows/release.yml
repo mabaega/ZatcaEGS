@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+      - name: Get Version
+        id: get_version
+        run: |
+          VERSION=$(grep -oP '(?<=<AssemblyVersion>).*(?=</AssemblyVersion>)' Zatca.EGS/Zatca.EGS.csproj)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ steps.get_version.outputs.version }} \
+            --title "Release ${{ steps.get_version.outputs.version }}" \
+            --generate-notes
+
+  build:
+    needs: create_release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            output_name: ZatcaEGS-linux
+            runtime: linux-x64
+          - os: windows-latest
+            output_name: ZatcaEGS-windows
+            runtime: win-x64
+          - os: macos-latest
+            output_name: ZatcaEGS-macos
+            runtime: osx-x64
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore dependencies
+        run: dotnet restore Zatca.EGS/Zatca.EGS.csproj
+      - name: Build
+        run: dotnet build Zatca.EGS/Zatca.EGS.csproj --configuration Release --no-restore
+      - name: Publish
+        run: dotnet publish Zatca.EGS/Zatca.EGS.csproj -c Release -o ./publish -r ${{ matrix.runtime }} --self-contained true
+      - name: Zip Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          filename: ${{ matrix.output_name }}.zip
+          directory: ./publish
+      - name: Upload Release Asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ needs.create_release.outputs.version }} ./publish/${{ matrix.output_name }}.zip
