@@ -21,7 +21,7 @@ namespace Zatca.eInvoice.Models
             Value = value;
         }
 
-        public ID(string schemeID, string schemeAgencyID, string value)  
+        public ID(string schemeID, string schemeAgencyID, string value)
         {
             SchemeID = schemeID;
             SchemeAgencyID = schemeAgencyID;

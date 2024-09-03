@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Net.Http.Headers;
-using System.Text;
-using Zatca.eInvoice.Models;
-using Zatca.EGS.Models;
-using Zatca.eInvoice.Helpers;
-using Zatca.eInvoice;
-using Zatca.EGS.Helpers;
 using Newtonsoft.Json.Linq;
 using System.IO.Compression;
+using System.Net.Http.Headers;
 using System.Net.Mime;
+using System.Text;
+using Zatca.EGS.Helpers;
+using Zatca.EGS.Models;
+using Zatca.eInvoice;
+using Zatca.eInvoice.Helpers;
+using Zatca.eInvoice.Models;
 
 namespace Zatca.EGS.Controllers
 {
@@ -164,13 +164,13 @@ namespace Zatca.EGS.Controllers
                             string fullPath = $"{ApiUrl}{apiPath}/{key}";
 
                             string nameValue = dataObject.Value<string>("Name");
-                            if (nameValue == null) 
+                            if (nameValue == null)
                             {
                                 nameValue = dataObject.Value<string>("Description");
                             }
 
                             var responseMessage = await SendDataToApi(fullPath, jsonPayload, apiKey);
-                            
+
                             result.AppendLine(nameValue + " " + responseMessage);
 
                             await Task.Delay(100); // Use Task.Delay for async delay
@@ -446,7 +446,7 @@ namespace Zatca.EGS.Controllers
 
                 return null;
             }
-            catch 
+            catch
             {
                 //Console.WriteLine(ex.Message);
                 return null;

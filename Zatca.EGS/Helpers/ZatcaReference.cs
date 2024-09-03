@@ -1,8 +1,8 @@
-﻿using System.Text;
-using Zatca.EGS.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
+using System.Text;
+using Zatca.EGS.Models;
 
 namespace Zatca.EGS.Helpers
 {
@@ -11,7 +11,7 @@ namespace Zatca.EGS.Helpers
         public static async Task<(string ICV, string PIH)> GetReferenceFolder(string apiPath, string apiSecret)
         {
             string fullPath = $"{apiPath}/folder-form/{ManagerCustomField.FolderReferenceGuid}";
-            
+
             //Console.WriteLine($"Request URL: {fullPath}");
 
             using (HttpClient client = new HttpClient())

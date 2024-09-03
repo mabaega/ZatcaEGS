@@ -94,7 +94,7 @@ namespace Zatca.eInvoice.Models
         [XmlElement(ElementName = "DocumentTypeCode", Namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2")]
         public string DocumentTypeCode { get; set; }
 
-        
+
     }
 
     public class ClassifiedTaxCategory
@@ -106,10 +106,10 @@ namespace Zatca.eInvoice.Models
         public double Percent { get; set; }
 
         [XmlElement(ElementName = "TaxExemptionReason", Namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2")]
-        public string TaxExemptionReason {  get; set; }
+        public string TaxExemptionReason { get; set; }
 
         [XmlElement(ElementName = "TaxExemptionReasonCode", Namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2")]
-        public string TaxExemptionReasonCode {  get; set; }
+        public string TaxExemptionReasonCode { get; set; }
 
         //[XmlIgnore]
         //[JsonIgnore]

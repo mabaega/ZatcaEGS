@@ -1,8 +1,8 @@
 ﻿using System.Text;
+using Zatca.EGS.Models;
 using Zatca.eInvoice;
 using Zatca.eInvoice.Helpers;
 using Zatca.eInvoice.Models;
-using Zatca.EGS.Models;
 
 namespace Zatca.EGS.Helpers
 {
@@ -167,7 +167,8 @@ namespace Zatca.EGS.Helpers
                         LatestDeliveryDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),
                     },
 
-                    PaymentMeans = new PaymentMeans { 
+                    PaymentMeans = new PaymentMeans
+                    {
                         PaymentMeansCode = "10",
                         InstructionNote = invType == InvoiceType.TaxInvoiceCreditNote || invType == InvoiceType.TaxInvoiceDebitNote ? "Instruction Note for Debit or Credit" : null
                     },
@@ -329,7 +330,7 @@ namespace Zatca.EGS.Helpers
                 }
 
             }
-            catch 
+            catch
             {
                 //Console.WriteLine($"Error creating RequestApi: {ex.Message}");
                 throw;

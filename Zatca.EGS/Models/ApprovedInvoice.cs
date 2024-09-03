@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Zatca.eInvoice.Helpers;
 using Zatca.EGS.Helpers;
+using Zatca.eInvoice.Helpers;
 
 namespace Zatca.EGS.Models
 {

@@ -7,8 +7,16 @@ using Zatca.EGS.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Kondisi kompilasi untuk Windows
+#if WINDOWS
 builder.Host.UseWindowsService();
 builder.Services.AddWindowsService();
+#endif
+
+// Kondisi kompilasi untuk Linux
+#if LINUX
+builder.Host.UseSystemd();
+#endif
 
 builder.Services.Configure<JsonOptions>(options =>
     options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull);
@@ -23,7 +31,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDistributedMemoryCache(); 
+builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
 {

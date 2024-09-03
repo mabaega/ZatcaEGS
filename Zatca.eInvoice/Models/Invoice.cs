@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -122,7 +121,7 @@ namespace Zatca.eInvoice.Models
 
         public EmbeddedDocumentBinaryObject() { }
 
-        public EmbeddedDocumentBinaryObject(string value) 
+        public EmbeddedDocumentBinaryObject(string value)
         {
             Value = value;
         }

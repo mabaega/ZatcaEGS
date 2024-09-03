@@ -1,6 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using System.Text;
-using Newtonsoft.Json;
 using Zatca.eInvoice;
 using Zatca.eInvoice.Helpers;
 using Zatca.eInvoice.Models;
@@ -113,10 +113,10 @@ public class ZatcaService
                 UUID = "8e6000cf-1a98-4174-b3e7-b5d5954bc10d",
                 IssueDate = "2022-08-17",
                 IssueTime = "17:41:08",
-                InvoiceTypeCode = new InvoiceTypeCode( InvoiceType.TaxInvoice, "0200000"),
+                InvoiceTypeCode = new InvoiceTypeCode(InvoiceType.TaxInvoice, "0200000"),
                 DocumentCurrencyCode = "SAR",
                 TaxCurrencyCode = "SAR",
-                Note = new Note() { LanguageID="ar",Value = "ABC"},
+                Note = new Note() { LanguageID = "ar", Value = "ABC" },
 
                 AdditionalDocumentReference =
                 [

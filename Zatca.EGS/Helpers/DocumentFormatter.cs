@@ -1,9 +1,9 @@
-﻿using System.Text;
-using System.Xml.Linq;
-using System.Xml;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using System.Globalization;
+using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Zatca.EGS.Helpers
 {

@@ -30,13 +30,13 @@ namespace Zatca.EGS.Models
             Key = formData.GetValueOrDefault("Key");
             Callback = formData.GetValueOrDefault("Callback");
             Data = formData.GetValueOrDefault("Data");
-            
+
             string DataString = JsonParser.UpdateJsonGuidValue(Data, ManagerCustomField.ZatcaUUIDGuid);
-            
+
             var (baseCurrency, businessDetails, dynamicParts) = JsonParser.ParseJson(DataString);
 
             var AccessToken = JsonParser.FindStringByGuid(businessDetails, ManagerCustomField.TokenInfoGuid);
-            
+
             var uri = new Uri(Referrer);
             var baseUrl = $"{uri.Scheme}://{uri.Host}";
 
@@ -53,7 +53,7 @@ namespace Zatca.EGS.Models
             {
                 CertificateInfo = ObjectCompressor.DeserializeFromBase64String<CertificateInfo>(certString);
             }
-            
+
             if (CertificateInfo != null)
             {
                 CertificateInfo.ApiSecret = AccessToken;
@@ -98,7 +98,7 @@ namespace Zatca.EGS.Models
                 };
 
                 Base64QrCode = JsonParser.FindStringByGuid(InvoiceJson, ManagerCustomField.QrCodeGuid, "RefInvoice");
-                
+
                 if (!string.IsNullOrEmpty(Base64QrCode))
                 {
                     ApprovalStatus = JsonParser.FindStringByGuid(InvoiceJson, ManagerCustomField.ApprovedInvoiceGuid, "RefInvoice");

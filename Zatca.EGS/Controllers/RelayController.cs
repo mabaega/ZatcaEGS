@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Zatca.EGS.Models;
-using Zatca.eInvoice.Models;
-using Zatca.EGS.Helpers;
-using System.Text;
-using Zatca.eInvoice;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Xml.Serialization;
-using Newtonsoft.Json.Linq;
+using Zatca.EGS.Helpers;
+using Zatca.EGS.Models;
+using Zatca.eInvoice;
+using Zatca.eInvoice.Models;
 
 namespace Zatca.EGS.Controllers
 {
@@ -417,9 +416,9 @@ namespace Zatca.EGS.Controllers
                             }
 
                             bool updateBusinessData = await ZatcaReference.UpdateReferenceFolder(_certInfo.ApiEndpoint, _certInfo.ApiSecret, model.ICV.ToString(), model.InvoiceHash);
-                            
+
                             Console.WriteLine(updateBusinessData);
-                            
+
                             if (updateBusinessData)
                             {
                                 string sanitizedReference = new(model.Reference.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray());

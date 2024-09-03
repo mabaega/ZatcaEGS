@@ -142,7 +142,7 @@ namespace Zatca.EGS.Models
 
             return $"https://gw-fatoora.zatca.gov.sa/e-invoicing/{environment}/{endpoint}";
         }
-                
+
         public bool IsRegistered() => !string.IsNullOrEmpty(CCSIDComplianceRequestId) && !string.IsNullOrEmpty(CCSIDBinaryToken) && !string.IsNullOrEmpty(CCSIDSecret) && !string.IsNullOrEmpty(PCSIDBinaryToken) && !string.IsNullOrEmpty(PCSIDSecret);
     }
 

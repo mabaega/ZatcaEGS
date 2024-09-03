@@ -1,4 +1,4 @@
- using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Zatca.EGS.Models;
 

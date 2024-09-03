@@ -1,8 +1,7 @@
 ﻿using Microsoft.VisualBasic;
+using Zatca.EGS.Models;
 using Zatca.eInvoice.Helpers;
 using Zatca.eInvoice.Models;
-using Zatca.EGS.Models;
-using Newtonsoft.Json.Linq;
 using static Zatca.EGS.Helpers.VATInfoHelper;
 
 namespace Zatca.EGS.Helpers
@@ -38,8 +37,8 @@ namespace Zatca.EGS.Helpers
                 invoiceType = 381;
             }
 
-            string invoiceSubType =  JsonParser.FindStringByGuid(_relayData.InvoiceJson, ManagerCustomField.InvoiceSubTypeGuid, "RefInvoice") ?? "0200000";
-            
+            string invoiceSubType = JsonParser.FindStringByGuid(_relayData.InvoiceJson, ManagerCustomField.InvoiceSubTypeGuid, "RefInvoice") ?? "0200000";
+
             Invoice invoice = new()
             {
                 ProfileID = "reporting:1.0",
@@ -196,8 +195,8 @@ namespace Zatca.EGS.Helpers
         private PaymentMeans CreatePaymentMeans()
         {
             var paymentMeansCode = 30;
-            string paymentMeans =  JsonParser.FindStringByGuid(_relayData.InvoiceJson, ManagerCustomField.PaymentMeansCodeGuid, "RefInvoice");
-            string instructionNote =  JsonParser.FindStringByGuid(_relayData.InvoiceJson, ManagerCustomField.InstructionNoteGuid, "RefInvoice");
+            string paymentMeans = JsonParser.FindStringByGuid(_relayData.InvoiceJson, ManagerCustomField.PaymentMeansCodeGuid, "RefInvoice");
+            string instructionNote = JsonParser.FindStringByGuid(_relayData.InvoiceJson, ManagerCustomField.InstructionNoteGuid, "RefInvoice");
 
             if (paymentMeans != null)
             {
@@ -263,7 +262,7 @@ namespace Zatca.EGS.Helpers
                     invoiceLine.Item.ClassifiedTaxCategory = new ClassifiedTaxCategory
                     {
                         Percent = rate,
-                        ID = new ID("UN/ECE 5305", "6",vatInfo.CategoryID),
+                        ID = new ID("UN/ECE 5305", "6", vatInfo.CategoryID),
                         TaxScheme = new TaxScheme
                         {
                             ID = new ID("UN/ECE 5153", "6", "VAT")
@@ -361,7 +360,7 @@ namespace Zatca.EGS.Helpers
             };
 
             taxTotals.Add(taxTotalWithSubtotals);
-                       
+
 
             return taxTotals;
         }
