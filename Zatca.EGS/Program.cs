@@ -7,10 +7,8 @@ using Zatca.EGS.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#if DebugP || ReleaseP
 builder.Host.UseWindowsService();
 builder.Services.AddWindowsService();
-#endif
 
 builder.Services.Configure<JsonOptions>(options =>
     options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull);
@@ -32,7 +30,7 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(10);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
 });
 
 var app = builder.Build();
