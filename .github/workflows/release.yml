@@ -66,7 +66,7 @@ jobs:
       - name: Build
         run: dotnet build Zatca.EGS/Zatca.EGS.csproj --configuration Release --no-restore
       - name: Publish
-        run: dotnet publish Zatca.EGS/Zatca.EGS.csproj -c Release -o ./publish -r ${{ matrix.runtime }} --self-contained true
+        run: dotnet publish Zatca.EGS/Zatca.EGS.csproj -c Release -o ./publish -r ${{ matrix.runtime }} --self-contained false
       - name: Zip Release
         uses: thedoctor0/zip-release@master
         with:
