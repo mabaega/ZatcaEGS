@@ -2,10 +2,14 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using System.Text.Json.Serialization;
-using Zatca.EGS.Helpers;
-
+using Zatca.EGS.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+//builder.Logging.AddFilter("Microsoft.AspNetCore.Session.SessionMiddleware", LogLevel.Error);
 
 // Kondisi kompilasi untuk Windows
 #if WINDOWS
@@ -31,15 +35,16 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDistributedMemoryCache();
+//builder.Services.AddDistributedMemoryCache();
 
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(10);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-});
+//builder.Services.AddSession(options =>
+//{
+//    options.IdleTimeout = TimeSpan.FromMinutes(10);
+//    options.Cookie.HttpOnly = true;
+//    options.Cookie.IsEssential = true;
+//    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+//});
+
 
 var app = builder.Build();
 
@@ -50,7 +55,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAllOrigins");
-app.UseSession();
+
+//app.UseSession();
 
 app.UseMiddleware<DisclaimerMiddleware>();
 
@@ -76,5 +82,3 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
-

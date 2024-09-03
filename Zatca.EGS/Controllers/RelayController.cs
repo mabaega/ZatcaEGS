@@ -13,20 +13,7 @@ namespace Zatca.EGS.Controllers
     [ApiController]
     public class RelayController : Controller
     {
-        private CertificateInfo GetCertificateInfoFromSession()
-        {
-            var certInfoJson = HttpContext.Session.GetString("CertInfo");
-            return string.IsNullOrEmpty(certInfoJson) ? null : JsonConvert.DeserializeObject<CertificateInfo>(certInfoJson);
-        }
-
-        private void SetCertificateInfoInSession(CertificateInfo certInfo)
-        {
-            var certInfoJson = JsonConvert.SerializeObject(certInfo);
-            HttpContext.Session.SetString("CertInfo", certInfoJson);
-        }
-
         private readonly HttpClient _httpClient = new();
-
 
         [HttpPost("relay")]
         public async Task<IActionResult> ProcessFormData([FromForm] Dictionary<string, string> formData)
@@ -51,7 +38,8 @@ namespace Zatca.EGS.Controllers
                 }
 
 
-                var _certInfo = relayData.CertificateInfo;
+                var _certInfo = ObjectCompressor.DeserializeFromBase64String<CertificateInfo>(relayData.CertInfoString);
+
 
                 if (_certInfo == null)
                 {
@@ -63,8 +51,6 @@ namespace Zatca.EGS.Controllers
 
                     return View("Certificate", CertificateViewModel);
                 }
-
-                SetCertificateInfoInSession(_certInfo);
 
 
                 (string icv, string pih) = await ZatcaReference.GetReferenceFolder(_certInfo.ApiEndpoint, _certInfo.ApiSecret);
@@ -145,6 +131,8 @@ namespace Zatca.EGS.Controllers
                     EditData = relayData.Data,
 
                     EnvironmentType = _certInfo.EnvironmentType,
+
+                    CertificateInfo = relayData.CertInfoString
                 };
 
                 return View("Index", approvedInvoice);
@@ -166,7 +154,7 @@ namespace Zatca.EGS.Controllers
         {
             try
             {
-                var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
+                var _certInfo = ObjectCompressor.DeserializeFromBase64String<CertificateInfo> (model.CertificateInfo) ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
 
                 ZatcaRequestApi zatcaRequestApi = new()
                 {
@@ -230,14 +218,15 @@ namespace Zatca.EGS.Controllers
         [HttpPost("clearance")]
         public async Task<IActionResult> Clearance([FromForm] ApprovedInvoice model)
         {
-            var testapi = await CheckMangerApiAsync(model.Referrer);
+            var _certInfo = ObjectCompressor.DeserializeFromBase64String<CertificateInfo>(model.CertificateInfo) ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
+
+
+            var testapi = await CheckMangerApiAsync(model.Referrer, _certInfo.ApiSecret);
 
             if (testapi)
             {
                 try
                 {
-                    var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
-
                     ZatcaRequestApi zatcaRequestApi = new()
                     {
                         Uuid = model.ZatcaUUID,
@@ -261,7 +250,7 @@ namespace Zatca.EGS.Controllers
                     {
                         var apiResponse = JsonConvert.DeserializeObject<ServerResult>(resultContent);
 
-                        apiResponse = apiResponse ?? new ServerResult();
+                        apiResponse ??= new ServerResult();
 
                         if (apiResponse.ClearedInvoice != null)
                         {
@@ -352,13 +341,14 @@ namespace Zatca.EGS.Controllers
         public async Task<IActionResult> Reporting([FromForm] ApprovedInvoice model)
         {
             {
-                var testapi = await CheckMangerApiAsync(model.Referrer);
+                var _certInfo = ObjectCompressor.DeserializeFromBase64String<CertificateInfo>(model.CertificateInfo) ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
+
+                var testapi = await CheckMangerApiAsync(model.Referrer, _certInfo.ApiSecret);
 
                 if (testapi)
                 {
                     try
                     {
-                        var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
                         ZatcaRequestApi zatcaRequestApi = new()
                         {
                             Uuid = model.ZatcaUUID,
@@ -417,7 +407,7 @@ namespace Zatca.EGS.Controllers
 
                             bool updateBusinessData = await ZatcaReference.UpdateReferenceFolder(_certInfo.ApiEndpoint, _certInfo.ApiSecret, model.ICV.ToString(), model.InvoiceHash);
 
-                            Console.WriteLine(updateBusinessData);
+                           //Console.WriteLine(updateBusinessData);
 
                             if (updateBusinessData)
                             {
@@ -655,16 +645,16 @@ namespace Zatca.EGS.Controllers
         //    }
         //}
 
-        private async Task<bool> CheckMangerApiAsync(string Referrer)
+        private static async Task<bool> CheckMangerApiAsync(string Referrer, string apiSecret)
         {
             try
             {
-                var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
+                //var _certInfo = GetCertificateInfoFromSession() ?? throw new InvalidOperationException("CertificateInfo is not available. Make sure to call ProcessFormData first.");
                 var apiUrl = UrlHelper.CheckApiUrl(Referrer);
 
                 using (var client = new HttpClient())
                 {
-                    client.DefaultRequestHeaders.Add("X-API-KEY", _certInfo.ApiSecret);
+                    client.DefaultRequestHeaders.Add("X-API-KEY", apiSecret);
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     var response = await client.GetAsync(apiUrl);

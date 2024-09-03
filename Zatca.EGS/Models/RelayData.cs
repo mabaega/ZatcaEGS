@@ -1,5 +1,6 @@
 ﻿
 using Newtonsoft.Json;
+using System.Globalization;
 using Zatca.EGS.Helpers;
 using Zatca.eInvoice.Helpers;
 
@@ -13,7 +14,7 @@ namespace Zatca.EGS.Models
         public string Callback { get; set; }
         public string InvoiceJson { get; set; }
         public ManagerInvoice ManagerInvoice { get; set; }
-        public CertificateInfo CertificateInfo { get; set; }
+        public string CertInfoString { get; set; }
         public PartyTaxInfo PartyInfo { get; set; }
         public string ApprovalStatus { get; set; }
         public string Base64QrCode { get; set; }
@@ -51,16 +52,17 @@ namespace Zatca.EGS.Models
 
             if (!string.IsNullOrEmpty(certString))
             {
-                CertificateInfo = ObjectCompressor.DeserializeFromBase64String<CertificateInfo>(certString);
-            }
+                CertificateInfo certificateInfo = ObjectCompressor.DeserializeFromBase64String<CertificateInfo>(certString);
 
-            if (CertificateInfo != null)
-            {
-                CertificateInfo.ApiSecret = AccessToken;
-                CertificateInfo.ApiEndpoint = baseUrl;
-                EnvironmentType = CertificateInfo.EnvironmentType;
-            }
+                if (certificateInfo != null)
+                {
+                    certificateInfo.ApiSecret = AccessToken;
+                    certificateInfo.ApiEndpoint = baseUrl;
+                    EnvironmentType = certificateInfo.EnvironmentType;
 
+                    CertInfoString = ObjectCompressor.SerializeToBase64String(certificateInfo);
+                }
+            }
 
             // Retrieve the JSON string associated with a specific GUID
             InvoiceJson = dynamicParts.GetValueOrDefault(Key);

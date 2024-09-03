@@ -25,7 +25,7 @@ namespace Zatca.EGS.Models
         public string RequestType { get; set; }
         public string StatusCode { get; set; }
         public string ApprovalStatus { get; set; }
-        public string UpdateInvoiceStatus { get; set; }
+        public string CertificateInfo { get; set; }
         public int ICV { get; set; }
         public string InvoiceHash { get; set; }
         public string EditData { get; set; } //Manager Data

@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Zatca.EGS.Models;
 
 namespace Zatca.EGS.Helpers
 {
@@ -23,14 +25,14 @@ namespace Zatca.EGS.Helpers
             {
                 if (property.Name != "BaseCurrency" && property.Name != "BusinessDetails")
                 {
-                    ParseDynamicPart(property.Name, property.Value, dynamicParts);
+                    ParseDynamicPart(property.Value, dynamicParts);
                 }
             }
 
             return (baseCurrency, businessDetails, dynamicParts);
         }
 
-        private static void ParseDynamicPart(string parentKey, JToken token, Dictionary<string, string> result)
+        private static void ParseDynamicPart(JToken token, Dictionary<string, string> result)
         {
             if (token.Type == JTokenType.Object)
             {
@@ -229,13 +231,13 @@ namespace Zatca.EGS.Helpers
                 throw new InvalidOperationException("The section with the specified key was not found.");
             }
 
-            var specificSection = targetSection[key] as JObject;
-            if (specificSection == null)
+            if (targetSection[key] is not JObject specificSection)
             {
                 throw new InvalidOperationException($"The key '{key}' is missing or is not an object.");
             }
 
             var customFields2 = specificSection["CustomFields2"] as JObject;
+
             if (customFields2?["Strings"]?[fieldGuid] != null)
             {
                 customFields2["Strings"][fieldGuid] = newValue;

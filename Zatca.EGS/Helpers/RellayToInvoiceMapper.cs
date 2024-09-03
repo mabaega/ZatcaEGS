@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using System.Reflection;
 using Zatca.EGS.Models;
 using Zatca.eInvoice.Helpers;
 using Zatca.eInvoice.Models;
@@ -18,8 +19,9 @@ namespace Zatca.EGS.Helpers
         public RelayToInvoiceMapper(RelayData relayData)
         {
             _relayData = relayData;
-            _certInfo = relayData.CertificateInfo;
 
+            _certInfo = ObjectCompressor.DeserializeFromBase64String<CertificateInfo>(relayData.CertInfoString) ;
+            
             _managerInvoice = relayData.ManagerInvoice;
             _invoiceCurrencyCode = _managerInvoice.InvoiceParty.Currency?.Code ?? "SAR";
             _taxCurrencyCode = "SAR";

@@ -49,7 +49,7 @@ namespace Zatca.EGS.Helpers
         {
             if (key == null) return new VATInfo(null, null, null, null);
 
-            return VATDictionary.TryGetValue(key, out VATInfo value) ? value : new VATInfo(null, null, null, null);
+            return VATDictionary.TryGetValue(key, out VATInfo value) ? value : new VATInfo("S", null, null, null);
         }
 
     }

@@ -157,19 +157,27 @@ namespace Zatca.EGS.Helpers
         private static string GenerateInvoiceInfo(ApprovedInvoice model)
         {
             string InvoiceInfo = $"ManagerUUID: \n{model.ManagerUUID}\n\n";
+            InvoiceInfo += $"Reference: \n{model.Reference}\n\n";
+            InvoiceInfo += $"IssueDate: \n{model.IssueDate}\n\n\n";
+
             InvoiceInfo += $"ApprovalStatus: \n{model.ApprovalStatus}\n\n";
-            InvoiceInfo += $"EnvironmentType: \n{model.EnvironmentType}\n\n\n";
-            InvoiceInfo += $"UpdatedRelayData: \n{model.EditData}\n\n\n";
+            InvoiceInfo += $"EnvironmentType: \n{model.EnvironmentType}\n\n";
             InvoiceInfo += $"ICV: \n{model.ICV}\n\n";
             InvoiceInfo += $"ZatcaUUID: \n{model.ZatcaUUID}\n\n";
             InvoiceInfo += $"InvoiceHash: \n{model.InvoiceHash}\n\n";
             InvoiceInfo += $"Base64SignedInvoice: \n{model.Base64SignedInvoice}\n\n\n";
-            InvoiceInfo += $"Base64QrCode: \n{model.Base64QrCode}\n\n";
-            var DecodedQrCode = model.DecodedQrCode;
-            InvoiceInfo += $"Decoded QrCode: \n{DecodedQrCode}\n\n";
+
             var formattedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(model.ServerResult), Formatting.Indented);
-            InvoiceInfo += $"ServerResult: \n{formattedJson}\n\n";
-            InvoiceInfo += $"TimeStamp: \n{model.Timestamp}\n\n";
+            InvoiceInfo += $"ServerResult: \n{formattedJson}\n\n\n";
+
+            InvoiceInfo += $"TimeStamp: \n{model.Timestamp}\n\n\n";
+
+            InvoiceInfo += $"Base64QrCode: \n{model.Base64QrCode}\n\n";
+
+            var DecodedQrCode = model.DecodedQrCode;
+            InvoiceInfo += $"Decoded QrCode: \n{DecodedQrCode}\n\n\n";
+            InvoiceInfo += $"UpdatedRelayData: \n{model.EditData}\n\n\n";
+
             return InvoiceInfo;
         }
     }
