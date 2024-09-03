@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /CFGenerator/CFGenerator.csproj
 /.github/workflows/Build-and-Release.yml
 /.github/workflows/release.yml
+/Zatca.EGS/UpdateVersion.ps1
