@@ -1,30 +1,56 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
-using Zatca.EGS.Extensions;
+using Zatca.EGS.Extensions; 
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
+var configuration = new ConfigurationBuilder()
+    .AddCommandLine(args)
+    .Build();
 
-//builder.Logging.AddFilter("Microsoft.AspNetCore.Session.SessionMiddleware", LogLevel.Error);
+// Check command-line arguments --p xxxx
+var portArg = configuration["p"];
 
-// Kondisi kompilasi untuk Windows
-#if WINDOWS
-builder.Host.UseWindowsService();
-builder.Services.AddWindowsService();
-#endif
+if (portArg != null && int.TryParse(portArg, out int parsedPort))
+{
+    if (parsedPort != 80 || parsedPort != 443 || parsedPort != 0)
+    {
+        Console.WriteLine($"Using port: {parsedPort}");
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Listen(System.Net.IPAddress.Any, parsedPort, listenOptions =>
+            {
+                listenOptions.UseHttps();
+            });
+            options.Listen(System.Net.IPAddress.Any, parsedPort + 1); // HTTP
+        });
+    }
+}
+else
+{
+    Console.WriteLine("Port argument not provided or invalid. Using default port.");
+}
 
-// Kondisi kompilasi untuk Linux
-#if LINUX
-builder.Host.UseSystemd();
-#endif
+// Configure host based on OS platform
+if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+{
+    // Use Windows Service for Windows
+    builder.Host.UseWindowsService();
+}
+else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+{
+    // Use Systemd for Linux and macOS
+    builder.Host.UseSystemd();
+}
 
+// Configure JSON options
 builder.Services.Configure<JsonOptions>(options =>
     options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull);
 
+// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
@@ -33,33 +59,29 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 
+// Add controllers with views
 builder.Services.AddControllersWithViews();
-
-//builder.Services.AddDistributedMemoryCache();
-
-//builder.Services.AddSession(options =>
-//{
-//    options.IdleTimeout = TimeSpan.FromMinutes(10);
-//    options.Cookie.HttpOnly = true;
-//    options.Cookie.IsEssential = true;
-//    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-//});
-
 
 var app = builder.Build();
 
+// Configure middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
+// Uncomment this for HTTPS redirection if needed
+// app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+app.UseRouting();
 app.UseCors("AllowAllOrigins");
 
-//app.UseSession();
-
+// Use custom middleware
 app.UseMiddleware<DisclaimerMiddleware>();
 
+// Use request localization
 var defaultCulture = new CultureInfo("en-US");
 var localizationOptions = new RequestLocalizationOptions
 {
@@ -67,13 +89,7 @@ var localizationOptions = new RequestLocalizationOptions
     SupportedCultures = new List<CultureInfo> { defaultCulture },
     SupportedUICultures = new List<CultureInfo> { defaultCulture }
 };
-
 app.UseRequestLocalization(localizationOptions);
-
-//app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
 
 app.UseAuthorization();
 
@@ -82,3 +98,5 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+
