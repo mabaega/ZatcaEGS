@@ -367,3 +367,5 @@ FodyWeavers.xsd
 /CFGenerator/CFGenerator.csproj
 /.github/workflows/Build-and-Release.yml
 /Zatca.EGS/UpdateVersion.ps1
+/XmlValidationTest/XmlValidationTest.csproj
+/XmlValidationTest
