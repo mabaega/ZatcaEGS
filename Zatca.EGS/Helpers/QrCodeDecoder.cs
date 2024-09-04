@@ -90,23 +90,28 @@ namespace Zatca.EGS.Helpers
 
         public static string GetDecodedContentAsString(string qrCodeContent)
         {
-            var decodedContent = DecodeQRCode(qrCodeContent);
-            var result = new StringBuilder();
-
-            foreach (var kvp in decodedContent)
+            if (!string.IsNullOrEmpty(qrCodeContent))
             {
-                result.AppendLine($"Tag: {kvp.Key}, Value: ");
-                if (kvp.Key > 7)
-                {
-                    result.AppendLine(BitConverter.ToString(kvp.Value).Replace("-", " "));
-                }
-                else
-                {
-                    result.AppendLine(Encoding.UTF8.GetString(kvp.Value));
-                }
-            }
+                var decodedContent = DecodeQRCode(qrCodeContent);
 
-            return result.ToString();
+                var result = new StringBuilder();
+
+                foreach (var kvp in decodedContent)
+                {
+                    result.AppendLine($"Tag: {kvp.Key}, Value: ");
+                    if (kvp.Key > 7)
+                    {
+                        result.AppendLine(BitConverter.ToString(kvp.Value).Replace("-", " "));
+                    }
+                    else
+                    {
+                        result.AppendLine(Encoding.UTF8.GetString(kvp.Value));
+                    }
+                }
+
+                return result.ToString();
+            }
+            return string.Empty;
         }
     }
 

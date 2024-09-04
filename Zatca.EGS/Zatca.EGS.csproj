@@ -11,8 +11,8 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <AssemblyVersion>24.09.02.0012</AssemblyVersion>
-    <FileVersion>24.09.02.0012</FileVersion>
+    <AssemblyVersion>24.09.04.0001</AssemblyVersion>
+    <FileVersion>24.09.04.0001</FileVersion>
   </PropertyGroup>
   
   <ItemGroup>

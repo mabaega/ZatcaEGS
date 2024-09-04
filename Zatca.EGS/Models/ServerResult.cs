@@ -2,17 +2,17 @@
 
 namespace Zatca.EGS.Models
 {
-    public class ZatcaRequestApi
-    {
-        [JsonProperty("uuid")]
-        public string Uuid { get; set; }
+    //public class ZatcaRequestApi
+    //{
+    //    [JsonProperty("uuid")]
+    //    public string uuid { get; set; }
 
-        [JsonProperty("invoiceHash")]
-        public string InvoiceHash { get; set; }
+    //    [JsonProperty("invoiceHash")]
+    //    public string invoiceHash { get; set; }
 
-        [JsonProperty("invoice")]
-        public string Invoice { get; set; }
-    }
+    //    [JsonProperty("invoice")]
+    //    public string invoice { get; set; }
+    //}
 
     public class ServerResult
     {
@@ -123,10 +123,11 @@ namespace Zatca.EGS.Models
 
     }
 
-    public class ApiResponse
+    public class ApiBadResponse
     {
         // Properti umum untuk semua jenis respons
         public string RequestUri { get; set; }
+        public string RequestType { get; set; }
         public string HttpCode { get; set; }
         public string HttpMessage { get; set; }
 

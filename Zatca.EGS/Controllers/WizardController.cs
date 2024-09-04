@@ -309,18 +309,18 @@ namespace Zatca.EGS.Controllers
                 if (model.CsrInvoiceType.StartsWith('1'))
                 {
                     iICV += 1;
-                    string InvDebitNote = ct.GetRequestApi("DN-202408-0001", "PCH-202408-0001", InvoiceType.TaxInvoiceDebitNote, "0100000", iICV, "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==");
+                    ZatcaRequestApi InvDebitNote = ct.GetRequestApi("DN-202408-0001", "PCH-202408-0001", InvoiceType.TaxInvoiceDebitNote, "0100000", iICV, "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==");
                     invoiceHash = await PostComplianceCheck(model.ComplianceCheckUrl, InvDebitNote, model.CCSIDBinaryToken, model.CCSIDSecret);
 
                     if (!string.IsNullOrEmpty(invoiceHash))
                     {
                         iICV += 1;
-                        string InvSales = ct.GetRequestApi("INV-202408-0001", null, InvoiceType.TaxInvoice, "0100000", iICV, invoiceHash);
+                        ZatcaRequestApi InvSales = ct.GetRequestApi("INV-202408-0001", null, InvoiceType.TaxInvoice, "0100000", iICV, invoiceHash);
                         invoiceHash = await PostComplianceCheck(model.ComplianceCheckUrl, InvSales, model.CCSIDBinaryToken, model.CCSIDSecret);
                         if (!string.IsNullOrEmpty(invoiceHash))
                         {
                             iICV += 1;
-                            string InvCreditNote = ct.GetRequestApi("CN-202408-0001", "INV-202408-0001", InvoiceType.TaxInvoiceCreditNote, "0100000", iICV, invoiceHash);
+                            ZatcaRequestApi InvCreditNote = ct.GetRequestApi("CN-202408-0001", "INV-202408-0001", InvoiceType.TaxInvoiceCreditNote, "0100000", iICV, invoiceHash);
                             invoiceHash = await PostComplianceCheck(model.ComplianceCheckUrl, InvCreditNote, model.CCSIDBinaryToken, model.CCSIDSecret);
                             if (string.IsNullOrEmpty(invoiceHash))
                             {
@@ -342,18 +342,18 @@ namespace Zatca.EGS.Controllers
                     };
 
                     iICV += 1;
-                    string InvDebitNote = ct.GetRequestApi("DN-202408-0001", "PCH-202408-0001", InvoiceType.TaxInvoiceDebitNote, "0200000", iICV, invoiceHash);
+                    ZatcaRequestApi InvDebitNote = ct.GetRequestApi("DN-202408-0001", "PCH-202408-0001", InvoiceType.TaxInvoiceDebitNote, "0200000", iICV, invoiceHash);
                     invoiceHash = await PostComplianceCheck(model.ComplianceCheckUrl, InvDebitNote, model.CCSIDBinaryToken, model.CCSIDSecret);
 
                     if (!string.IsNullOrEmpty(invoiceHash))
                     {
                         iICV += 1;
-                        string InvSales = ct.GetRequestApi("INV-202408-0001", null, InvoiceType.TaxInvoice, "0200000", iICV, invoiceHash);
+                        ZatcaRequestApi InvSales = ct.GetRequestApi("INV-202408-0001", null, InvoiceType.TaxInvoice, "0200000", iICV, invoiceHash);
                         invoiceHash = await PostComplianceCheck(model.ComplianceCheckUrl, InvSales, model.CCSIDBinaryToken, model.CCSIDSecret);
                         if (!string.IsNullOrEmpty(invoiceHash))
                         {
                             iICV += 1;
-                            string InvCreditNote = ct.GetRequestApi("CN-202408-0001", "INV-202408-0001", InvoiceType.TaxInvoiceCreditNote, "0200000", iICV, invoiceHash);
+                            ZatcaRequestApi InvCreditNote = ct.GetRequestApi("CN-202408-0001", "INV-202408-0001", InvoiceType.TaxInvoiceCreditNote, "0200000", iICV, invoiceHash);
                             invoiceHash = await PostComplianceCheck(model.ComplianceCheckUrl, InvCreditNote, model.CCSIDBinaryToken, model.CCSIDSecret);
                             if (string.IsNullOrEmpty(invoiceHash))
                             {
@@ -409,7 +409,7 @@ namespace Zatca.EGS.Controllers
             }
         }
 
-        public async Task<string> PostComplianceCheck(string ComplianceCheckUrl, string RequestApi, string CCSIDBinaryToken, string CCSIDSecret)
+        public async Task<string> PostComplianceCheck(string ComplianceCheckUrl, ZatcaRequestApi RequestApi, string CCSIDBinaryToken, string CCSIDSecret)
         {
             try
             {
@@ -420,7 +420,9 @@ namespace Zatca.EGS.Controllers
                 _httpClient.DefaultRequestHeaders.Add("Accept-Version", "V2");
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{CCSIDBinaryToken}:{CCSIDSecret}")));
 
-                var content = new StringContent(RequestApi, Encoding.UTF8, "application/json");
+                var jsonContent = JsonConvert.SerializeObject(RequestApi);
+
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                 var response = await _httpClient.PostAsync(ComplianceCheckUrl, content);
 
@@ -439,9 +441,7 @@ namespace Zatca.EGS.Controllers
 
                 if (apiResponse.ClearanceStatus == "CLEARED" || apiResponse.ReportingStatus == "REPORTED")
                 {
-                    var requestJson = JsonConvert.DeserializeObject<ZatcaRequestApi>(RequestApi);
-
-                    return requestJson.InvoiceHash;
+                    return RequestApi.invoiceHash;
                 }
 
                 return null;

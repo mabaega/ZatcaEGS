@@ -326,6 +326,7 @@
                                         @if (!(Model.ApprovalStatus == "CLEARED" || Model.ApprovalStatus == "REPORTED"))
                                         {
                                             <button type="submit" formaction="@Url.Action("ComplianceCheck")" class="btn btn-info mt-1">Compliance Check</button>
+                                            @* <button type="submit" formaction="@Url.Action("SanboxComplianceCheck")" class="btn btn-info mt-1">Compliance Check</button> *@
                                         }
                                         else if ((Model.ApprovalStatus == "CLEARED" || Model.ApprovalStatus == "REPORTED") && Model.RequestType == "Invoice Compliant Check")
                                         {
@@ -408,6 +409,9 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             var Base64QrCode = "@Model.Base64QrCode".replace(/&#x2B;/g, '+');
+            if (!Base64QrCode || Base64QrCode.trim() === "") {
+                Base64QrCode = "Uncleared Invoice";
+            }
             generateQRCode(Base64QrCode);
 
             const fileContent = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(fileContent));

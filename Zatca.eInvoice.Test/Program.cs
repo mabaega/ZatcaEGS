@@ -332,14 +332,14 @@ public class ZatcaService
                 EcSecp256k1Privkeypem
             );
 
-            ig.GetSignedInvoiceXML(out string invoiceHash, out string base64SignedInvoice, out string base64QrCode, out string XmlFileName, out string requestApi);
+            ig.GetSignedInvoiceXML(out string invoiceHash, out string base64SignedInvoice, out string base64QrCode, out string XmlFileName, out ZatcaRequestApi requestApi);
 
             return new SignedInvoiceResult
             {
                 Base64SignedInvoice = base64SignedInvoice,
                 Base64QrCode = base64QrCode,
                 XmlFileName = XmlFileName,
-                RequestApi = requestApi
+                RequestApi = JsonConvert.SerializeObject(requestApi)
             };
         }
         catch (Exception ex)

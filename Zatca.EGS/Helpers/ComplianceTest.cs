@@ -112,7 +112,7 @@ namespace Zatca.EGS.Helpers
             }
         }
 
-        public string GetRequestApi(string InvRefNumber, string billRefNum, InvoiceType invType, string InvSubtype, int ICV, string PIH)
+        public ZatcaRequestApi GetRequestApi(string InvRefNumber, string billRefNum, InvoiceType invType, string InvSubtype, int ICV, string PIH)
         {
             try
             {
@@ -316,19 +316,8 @@ namespace Zatca.EGS.Helpers
                     _EcSecp256k1Privkeypem
                 );
 
-                if (invoiceObject.InvoiceTypeCode.Name.StartsWith("01"))
-                {
-                    //Standard Invoice
-                    ig.GetInvoiceXML(out string InvoiceHash, out string base64SignedInvoice, out string XmlFileName, out string requestApi);
+                    ig.GetSignedInvoiceXML(out string InvoiceHash, out string base64SignedInvoice, out string base64QrCode, out string XmlFileName, out ZatcaRequestApi requestApi);
                     return requestApi;
-                }
-                else
-                {
-                    //Simplified Invoice
-                    ig.GetSignedInvoiceXML(out string InvoiceHash, out string base64SignedInvoice, out string base64QrCode, out string XmlFileName, out string requestApi);
-                    return requestApi;
-                }
-
             }
             catch
             {

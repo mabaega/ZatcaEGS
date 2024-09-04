@@ -38,12 +38,12 @@ namespace Zatca.EGS.Models
         public EnvironmentType EnvironmentType { get; set; } = EnvironmentType.NonProduction;
         public DateTime Timestamp { get; set; } = DateTime.Now;
 
-        private string _decodedQrCode;
+        private string _decodedQrCode = "Uncleared Invoice";
         public string DecodedQrCode
         {
             get
             {
-                _decodedQrCode = QrCodeDecoder.GetDecodedContentAsString(Base64QrCode);
+                if (!string.IsNullOrEmpty(Base64QrCode)) { _decodedQrCode = QrCodeDecoder.GetDecodedContentAsString(Base64QrCode); }
                 return _decodedQrCode;
             }
         }
