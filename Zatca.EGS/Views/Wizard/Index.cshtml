@@ -305,14 +305,12 @@
                             <div class="col-md-12">
                                 <div class="container border border-tertiary" style="border-radius: 5px; padding: 20px;">
                                     <div class="row d-flex justify-content-center">
-                                        <div class="col-md-4">
-                                            <div style="padding: 10px;">
+                                        <div class="col-md-6">
                                                 <div class="input-group input-group-sm mt-1">
-                                                    <span class="input-group-text text-start">CCSID OTP</span>
+                                                    <span class="form-control form-control-sm text-start">CCSID OTP</span>
                                                     <input type="text" id="CCSIDOTP" class="form-control form-control-sm text-center" readonly="@Model.IsRegistered()" style="width: 50px;">
-                                                    <button id="ccsidButton" type="button" @(Model.IsRegistered() ? "disabled" : "") class="btn btn-outline-secondary btn-sm" style="width: 30px;">Get CCSID</button>
+                                                    <button id="ccsidButton" type="button" class="form-control form-control-sm btn btn-outline-success btn-sm text-center" @(Model.IsRegistered() ? "disabled" : "") >Get CCSID</button>
                                                 </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
