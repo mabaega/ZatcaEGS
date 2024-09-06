@@ -144,6 +144,7 @@ namespace ZatcaEGS.Models
     public class LineItem
     {
         public string ItemCode { get; set; }
+        public string Name { get; set; }
         public string ItemName { get; set; }
         public string UnitName { get; set; }
         public bool HasDefaultLineDescription { get; set; } = false;

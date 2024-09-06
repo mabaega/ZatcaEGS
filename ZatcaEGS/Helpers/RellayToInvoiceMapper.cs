@@ -240,10 +240,10 @@ namespace ZatcaEGS.Helpers
                 if (line.Item != null)
                 {
                     invoiceLine.ID = new ID((++i).ToString());
-                    invoiceLine.InvoicedQuantity = new InvoicedQuantity(line.Item.UnitName, invoicedQuantity);
+                    invoiceLine.InvoicedQuantity = new InvoicedQuantity(line.Item.UnitName ?? "", invoicedQuantity);
                     invoiceLine.Item = new Zatca.eInvoice.Models.Item
                     {
-                        Name = line.Item.ItemName
+                        Name = line.Item.ItemName ?? line.Item.Name,
                     };
                     invoiceLine.LineExtensionAmount = new Amount(_invoiceCurrencyCode, lineExtensionAmount);
                     invoiceLine.Price = new Price
