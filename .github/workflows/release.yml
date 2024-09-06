@@ -72,8 +72,8 @@ jobs:
         run: |
           mkdir -p ZatcaEGS.app/Contents/{MacOS,Resources}
           cp Zatca.EGS/wwwroot/images/apple-icon.icns ZatcaEGS.app/Contents/Resources/
-          echo -e "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n  <key>CFBundleExecutable</key>\n  <string>ZatcaEGS</string>\n  <key>CFBundleIconFile</key>\n  <string>apple-icon</string>\n</dict>\n</plist>" > ZatcaEGS.app/Contents/Info.plist
-          cp ./publish/ZatcaEGS ZatcaEGS.app/Contents/MacOS/ZatcaEGS
+          echo -e "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n  <key>CFBundleExecutable</key>\n  <string>ZatcaEGS</string>\n  <key>CFBundleIconFile</key>\n  <string>apple-icon</string>\n</dict>\n</plist>" > ZatcaEGS.app/Contents/Info.plist
+          cp ./publish/Zatca.EGS ZatcaEGS.app/Contents/MacOS/ZatcaEGS
           chmod +x ZatcaEGS.app/Contents/MacOS/ZatcaEGS
       - name: Zip Release
         run: zip -r ${{ matrix.output_name }}.zip ./publish
