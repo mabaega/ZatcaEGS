@@ -12,8 +12,8 @@ public class ZatcaService
     private const string ComplianceCSIDUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/compliance";
     private const string ProductionCSIDUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/production/csids";
     private const string ComplianceCheckUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/compliance/invoices";
-    private const string ReportingUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/reporting/single";
-    private const string ClearanceUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single";
+    //private const string ReportingUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/reporting/single";
+    //private const string ClearanceUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single";
 
     private readonly HttpClient _httpClient;
 
@@ -102,7 +102,7 @@ public class ZatcaService
     }
 
 
-    public async Task<SignedInvoiceResult> CreateSignedInvoice(string CSIDBinaryToken, string EcSecp256k1Privkeypem)
+    public static async Task<SignedInvoiceResult> CreateInvoiceXml(string CSIDBinaryToken, string EcSecp256k1Privkeypem)
     {
         try
         {
@@ -406,17 +406,17 @@ public class SignedInvoiceResult
     public string RequestApi { get; set; }
 }
 
-public class ZatcaRequestApi
-{
-    [JsonProperty("uuid")]
-    public string Uuid { get; set; }
+//public class ZatcaRequestApi
+//{
+//    [JsonProperty("uuid")]
+//    public string Uuid { get; set; }
 
-    [JsonProperty("invoiceHash")]
-    public string InvoiceHash { get; set; }
+//    [JsonProperty("invoiceHash")]
+//    public string InvoiceHash { get; set; }
 
-    [JsonProperty("invoice")]
-    public string Invoice { get; set; }
-}
+//    [JsonProperty("invoice")]
+//    public string Invoice { get; set; }
+//}
 
 public class ServerResult
 {
@@ -547,8 +547,8 @@ class Program
                 //Console.WriteLine($"PCSID Secret:\n{result.PCSIDSecret}  \n\n");
 
                 //// Step 2: Create Signed Invoice
-                ////var signedInvoiceResult = await zatcaService.CreateSignedInvoice(result.PCSIDBinaryToken, result.PrivateKey);
-                //var signedInvoiceResult = await zatcaService.CreateSignedInvoice(result.CCSIDBinaryToken, result.PrivateKey);
+                ////var signedInvoiceResult = await zatcaService.CreateInvoiceXml(result.PCSIDBinaryToken, result.PrivateKey);
+                //var signedInvoiceResult = await zatcaService.CreateInvoiceXml(result.CCSIDBinaryToken, result.PrivateKey);
 
                 //Console.WriteLine("Signed Invoice Result:\n\n");
                 ////Console.WriteLine($"Base64 Signed Invoice:\n{signedInvoiceResult.Base64SignedInvoice} \n");

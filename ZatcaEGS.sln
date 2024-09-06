@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zatca.eInvoice", "Zatca.eIn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zatca.eInvoice.Test", "Zatca.eInvoice.Test\Zatca.eInvoice.Test.csproj", "{2D1BCAFB-BB8F-4D44-A8D5-0889153DC1E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zatca.EGS", "Zatca.EGS\Zatca.EGS.csproj", "{89BD9AFD-AF48-4DA9-A7D6-25CE05A537A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZatcaEGS", "ZatcaEGS\ZatcaEGS.csproj", "{89BD9AFD-AF48-4DA9-A7D6-25CE05A537A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

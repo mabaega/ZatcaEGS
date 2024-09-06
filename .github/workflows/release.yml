@@ -20,7 +20,7 @@ jobs:
       - name: Get Version
         id: get_version
         run: |
-          VERSION=$(grep -oP '(?<=<AssemblyVersion>).*(?=</AssemblyVersion>)' Zatca.EGS/Zatca.EGS.csproj)
+          VERSION=$(grep -oP '(?<=<AssemblyVersion>).*(?=</AssemblyVersion>)' ZatcaEGS/ZatcaEGS.csproj)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Create Release
         id: create_release
@@ -62,18 +62,18 @@ jobs:
       - name: List Directory Contents
         run: ls -R
       - name: Restore dependencies
-        run: dotnet restore Zatca.EGS/Zatca.EGS.csproj
+        run: dotnet restore ZatcaEGS/ZatcaEGS.csproj
       - name: Build
-        run: dotnet build Zatca.EGS/Zatca.EGS.csproj --configuration Release --no-restore
+        run: dotnet build ZatcaEGS/ZatcaEGS.csproj --configuration Release --no-restore
       - name: Publish
-        run: dotnet publish Zatca.EGS/Zatca.EGS.csproj -c Release -o ./publish -r ${{ matrix.runtime }} --self-contained false
+        run: dotnet publish ZatcaEGS/ZatcaEGS.csproj -c Release -o ./publish -r ${{ matrix.runtime }} --self-contained false
       - name: Create macOS App Bundle
         if: matrix.os == 'macos-latest'
         run: |
           mkdir -p ZatcaEGS.app/Contents/{MacOS,Resources}
-          cp Zatca.EGS/wwwroot/images/apple-icon.icns ZatcaEGS.app/Contents/Resources/
+          cp ZatcaEGS/wwwroot/images/apple-icon.icns ZatcaEGS.app/Contents/Resources/
           echo -e "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n  <key>CFBundleExecutable</key>\n  <string>ZatcaEGS</string>\n  <key>CFBundleIconFile</key>\n  <string>apple-icon</string>\n</dict>\n</plist>" > ZatcaEGS.app/Contents/Info.plist
-          cp ./publish/Zatca.EGS ZatcaEGS.app/Contents/MacOS/ZatcaEGS
+          cp ./publish/ZatcaEGS ZatcaEGS.app/Contents/MacOS/ZatcaEGS
           chmod +x ZatcaEGS.app/Contents/MacOS/ZatcaEGS
       - name: Zip Release
         uses: thedoctor0/zip-release@master
