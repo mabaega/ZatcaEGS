@@ -76,7 +76,8 @@ jobs:
           cp ./publish/Zatca.EGS ZatcaEGS.app/Contents/MacOS/ZatcaEGS
           chmod +x ZatcaEGS.app/Contents/MacOS/ZatcaEGS
       - name: Zip Release
-        run: zip -r ${{ matrix.output_name }}.zip ./publish
+        run: |
+          zip -r ./publish/${{ matrix.output_name }}.zip ./publish
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
