@@ -1,6 +1,5 @@
 ﻿
 using Newtonsoft.Json;
-using System.Globalization;
 using Zatca.EGS.Helpers;
 using Zatca.eInvoice.Helpers;
 

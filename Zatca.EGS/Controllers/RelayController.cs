@@ -55,15 +55,19 @@ namespace Zatca.EGS.Controllers
 
                 (string icv, string pih) = await ZatcaReference.GetReferenceFolder(_certInfo.ApiEndpoint, _certInfo.ApiSecret);
 
-                if (!string.IsNullOrEmpty(icv) && int.TryParse(icv, out int icvNumber))
+                if(string.IsNullOrEmpty(icv) || string.IsNullOrEmpty(pih))
                 {
-                    relayData.LastICV = icvNumber;
-                }
-                if (!string.IsNullOrEmpty(pih))
-                {
-                    relayData.LastPIH = pih;
+                    var errorModel = new ErrorViewModel
+                    {
+                        ErrorMessage = $"Can't read LastICV and LastPIH from Business Data!! \nMake sure AccessToken In Busines Detail is still valid, and ZatcaReference in Folders Tab has value.",
+                        ReferrerLink = formData.GetValueOrDefault("Referrer")
+                    };
+                    return View("Error", errorModel);
                 }
 
+                relayData.LastICV = int.TryParse(icv, out int icvNumber) ? icvNumber : relayData.LastICV;
+                relayData.LastPIH = pih;
+                
 
                 string zatcaUUID = relayData.Key;
 

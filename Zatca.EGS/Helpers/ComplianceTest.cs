@@ -316,8 +316,8 @@ namespace Zatca.EGS.Helpers
                     _EcSecp256k1Privkeypem
                 );
 
-                    ig.GetSignedInvoiceXML(out string InvoiceHash, out string base64SignedInvoice, out string base64QrCode, out string XmlFileName, out ZatcaRequestApi requestApi);
-                    return requestApi;
+                ig.GetSignedInvoiceXML(out string InvoiceHash, out string base64SignedInvoice, out string base64QrCode, out string XmlFileName, out ZatcaRequestApi requestApi);
+                return requestApi;
             }
             catch
             {

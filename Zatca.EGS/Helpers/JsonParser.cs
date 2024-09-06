@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Zatca.EGS.Models;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Zatca.EGS.Helpers
 {

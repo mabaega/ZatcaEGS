@@ -264,7 +264,7 @@
 
                             <div class="col-md-3 mb-3">
                                 <div class="form-group">
-                                    <label style="color: var(--bs-success);" class="form-label" asp-for="EnvironmentType">Select CSR Type</label>
+                                    <label style="color: var(--bs-success);" class="form-label" asp-for="EnvironmentType">CSR Environment Type</label>
                                     <select id="EnvironmentType" asp-for="EnvironmentType" class="form-control form-control-sm" disabled="@Model.IsRegistered()">
                                         @foreach (var value in Enum.GetValues(typeof(EnvironmentType)))
                                         {

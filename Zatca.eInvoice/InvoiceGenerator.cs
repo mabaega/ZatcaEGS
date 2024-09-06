@@ -74,7 +74,7 @@ namespace Zatca.eInvoice
             {
                 string CleanInvoice = GetCleanInvoiceXML(true);
                 InvoiceHash = SharedUtilities.GetBase64InvoiceHash(CleanInvoice);
-                
+
                 base64QrCode = "";
 
                 if (InvoiceObject.InvoiceTypeCode.Name.StartsWith("02"))

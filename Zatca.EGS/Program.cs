@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
-using Zatca.EGS.Extensions; 
+using Zatca.EGS.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
