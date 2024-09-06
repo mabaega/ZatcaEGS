@@ -369,3 +369,5 @@ FodyWeavers.xsd
 /Zatca.EGS/UpdateVersion.ps1
 /XmlValidationTest/XmlValidationTest.csproj
 /XmlValidationTest
+/ZatcaEGS/Properties/PublishProfiles/ZatcaEGS - Web Deploy.pubxml
+/ZatcaEGS/Properties/PublishProfiles/FolderProfile.pubxml
