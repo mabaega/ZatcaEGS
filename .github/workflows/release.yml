@@ -67,6 +67,11 @@ jobs:
         run: dotnet build Zatca.EGS/Zatca.EGS.csproj --configuration Release --no-restore
       - name: Publish
         run: dotnet publish Zatca.EGS/Zatca.EGS.csproj -c Release -o ./publish -r ${{ matrix.runtime }} --self-contained false
+      - name: Create macOS App Bundle
+        if: matrix.os == 'macos-latest'
+        run: |
+          dotnet tool install -g macpack
+          macpack -o ZatcaEGS.app -n "ZatcaEGS" -i Zatca.EGS/wwwroot/images/apple-icon.icns -c "dotnet Zatca.EGS.dll"
       - name: Zip Release
         uses: thedoctor0/zip-release@master
         with:
