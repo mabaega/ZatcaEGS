@@ -229,7 +229,7 @@ namespace ZatcaEGS.Helpers
             {
                 double percent = (line.TaxCode?.Rate ?? 0) / 100;
                 double invoicedQuantity = Math.Round((line.Qty != 0 ? line.Qty : 1), 4);
-                double discount = line.DiscountAmount * (_managerInvoice.Discount ? 1 : 0);
+                double discount = line.DiscountAmount * (hasDiscount ? 1 : 0);
                 double unitPrice = ((line.UnitPrice * invoicedQuantity) - discount) / invoicedQuantity;
                 double priceAmount = Math.Round(amountsIncludeTax ? (unitPrice / (1 + percent)) : unitPrice, 4);
                 double lineExtensionAmount = Math.Round(invoicedQuantity * priceAmount, 2);

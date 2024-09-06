@@ -21,17 +21,13 @@ if (portArg != null && int.TryParse(portArg, out int parsedPort))
         Console.WriteLine($"Using port: {parsedPort}");
         builder.WebHost.ConfigureKestrel(options =>
         {
-            options.Listen(System.Net.IPAddress.Any, parsedPort, listenOptions =>
-            {
-                listenOptions.UseHttps();
-            });
-            options.Listen(System.Net.IPAddress.Any, parsedPort + 1); // HTTP
+            //options.Listen(System.Net.IPAddress.Any, parsedPort, listenOptions =>
+            //{
+            //    listenOptions.UseHttps();
+            //});
+            options.Listen(System.Net.IPAddress.Any, parsedPort); // HTTP
         });
     }
-}
-else
-{
-    Console.WriteLine("Port argument not provided or invalid. Using default port.");
 }
 
 // Configure host based on OS platform

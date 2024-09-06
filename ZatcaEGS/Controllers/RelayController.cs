@@ -59,7 +59,7 @@ namespace ZatcaEGS.Controllers
                 {
                     var errorModel = new ErrorViewModel
                     {
-                        ErrorMessage = $"Can't read LastICV and LastPIH from Business Data!! \nMake sure AccessToken In Busines Detail is still valid, and ZatcaReference in Folders Tab has value.",
+                        ErrorMessage = $"Can't read LastICV and LastPIH from Business Data!! Make sure you use Manager Cloud Edition, AccessToken In Busines Detail is still valid and ZatcaReference LastICV and LastPIH in Folders Tab has value.",
                         ReferrerLink = formData.GetValueOrDefault("Referrer")
                     };
                     return View("Error", errorModel);
