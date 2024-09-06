@@ -20,7 +20,7 @@ jobs:
       - name: Get Version
         id: get_version
         run: |
-          VERSION=$(grep -oP '(?<=<AssemblyVersion>).*(?=</AssemblyVersion>)' ZatcaEGS/ZatcaEGS.csproj)
+          VERSION=$(grep -oP '(?<=<AssemblyVersion>).*(?=</AssemblyVersion>)' Zatca.EGS/Zatca.EGS.csproj)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Create Release
         id: create_release
