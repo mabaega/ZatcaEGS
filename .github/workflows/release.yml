@@ -70,14 +70,13 @@ jobs:
       - name: Create macOS App Bundle
         if: matrix.os == 'macos-latest'
         run: |
-          dotnet tool install -g macpack
-          macpack -o ZatcaEGS.app -n "ZatcaEGS" -i Zatca.EGS/wwwroot/images/apple-icon.icns -c "dotnet Zatca.EGS.dll"
+          mkdir -p ZatcaEGS.app/Contents/{MacOS,Resources}
+          cp Zatca.EGS/wwwroot/images/apple-icon.icns ZatcaEGS.app/Contents/Resources/
+          echo -e "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n  <key>CFBundleExecutable</key>\n  <string>ZatcaEGS</string>\n  <key>CFBundleIconFile</key>\n  <string>apple-icon</string>\n</dict>\n</plist>" > ZatcaEGS.app/Contents/Info.plist
+          cp ./publish/ZatcaEGS ZatcaEGS.app/Contents/MacOS/ZatcaEGS
+          chmod +x ZatcaEGS.app/Contents/MacOS/ZatcaEGS
       - name: Zip Release
-        uses: thedoctor0/zip-release@master
-        with:
-          type: 'zip'
-          filename: ${{ matrix.output_name }}.zip
-          directory: ./publish
+        run: zip -r ${{ matrix.output_name }}.zip ./publish
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
