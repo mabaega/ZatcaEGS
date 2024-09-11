@@ -4,6 +4,8 @@ ZatcaEGS (Zatca eInvoice Generation System) is an application designed to integr
 
 ![Latest Release](https://img.shields.io/github/v/release/mabaega/ZatcaEGS)
 
+[Live Services](https://zatcaegs.azurewebsites.net)
+
 ## Latest Release
 
 [View Latest Release](https://github.com/mabaega/ZatcaEGS/releases/latest)
