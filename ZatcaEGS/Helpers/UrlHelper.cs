@@ -1,7 +1,4 @@
-﻿
-using ZatcaEGS.Models;
-
-namespace ZatcaEGS.Helpers
+﻿namespace ZatcaEGS.Helpers
 {
     public static class UrlHelper
     {
@@ -34,31 +31,6 @@ namespace ZatcaEGS.Helpers
 
             throw new ArgumentException("Invalid referrer URL");
         }
-        public static string CheckApiUrl(string referrer)
-        {
-            var uri = new Uri(referrer);
-            var baseUrl = $"{uri.Scheme}://{uri.Host}";
-
-            if (uri.Port != 80 && uri.Port != 443)
-            {
-                baseUrl += $":{uri.Port}";
-            }
-
-            return $"{baseUrl}/api2/access-tokens?fields=Name";
-        }
-
-        public static string GetFolderUrl(string referrer)
-        {
-            var uri = new Uri(referrer);
-            var baseUrl = $"{uri.Scheme}://{uri.Host}";
-
-            if (uri.Port != 80 && uri.Port != 443)
-            {
-                baseUrl += $":{uri.Port}";
-            }
-
-            return $"{baseUrl}/api2/folder-form/{ManagerCustomField.FolderReferenceGuid}";
-        }
 
         public static string RelayUrl(string referrer)
         {
@@ -71,6 +43,21 @@ namespace ZatcaEGS.Helpers
             }
 
             return $"{baseUrl}/relay";
+        }
+
+        public static string GetApiEndpoint(string referrer)
+        {
+            var uri = new Uri(referrer);
+            var baseUrl = $"{uri.Scheme}://{uri.Host}";
+
+            if (uri.Port != 80 && uri.Port != 443)
+            {
+                baseUrl += $":{uri.Port}";
+            }
+
+            baseUrl += "/api2";
+
+            return baseUrl;
         }
 
     }

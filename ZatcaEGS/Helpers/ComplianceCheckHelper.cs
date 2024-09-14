@@ -6,13 +6,13 @@ using ZatcaEGS.Models;
 
 namespace ZatcaEGS.Helpers
 {
-    public class ComplianceTest
+    public class ComplianceCheckHelper
     {
         private readonly CertificateInfo _certInfo;
         private readonly string _CSIDBinaryToken;
         private readonly string _EcSecp256k1Privkeypem;
 
-        public ComplianceTest(CertificateInfo certInfo, string CSIDBinaryToken, string EcSecp256k1Privkeypem)
+        public ComplianceCheckHelper(CertificateInfo certInfo, string CSIDBinaryToken, string EcSecp256k1Privkeypem)
         {
             _certInfo = certInfo ?? new CertificateInfo();
             _CSIDBinaryToken = CSIDBinaryToken;

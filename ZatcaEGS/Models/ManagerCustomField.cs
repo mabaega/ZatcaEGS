@@ -24,9 +24,11 @@
         public const string ZatcaUUIDGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000017";
         public const string QrCodeGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000018";
 
+        public const string DateCreatedGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000020";
+
         public const string ItemTaxCategoryGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000019";
 
-        public const string FolderReferenceGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000909";
+        //public const string FolderReferenceGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000909";
 
     }
 }

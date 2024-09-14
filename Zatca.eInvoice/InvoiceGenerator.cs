@@ -68,6 +68,21 @@ namespace Zatca.eInvoice
             }
         }
 
+        public SignedInvoiceResult GetSignedInvoiceResult()
+        {
+            GetSignedInvoiceXML(out string invoiceHash, out string base64SignedInvoice, out string base64QrCode, out string xmlFileName, out ZatcaRequestApi requestApi);
+
+            return new SignedInvoiceResult()
+            {
+                InvoiceHash = invoiceHash,
+                Base64SignedInvoice = base64SignedInvoice,
+                Base64QrCode = base64QrCode,
+                XmlFileName = xmlFileName,
+                RequestApi = requestApi
+            };
+        }
+
+
         public void GetSignedInvoiceXML(out string InvoiceHash, out string base64SignedInvoice, out string base64QrCode, out string XmlFileName, out ZatcaRequestApi requestApi)
         {
             try

@@ -1,7 +1,6 @@
-﻿
-using Newtonsoft.Json;
-using ZatcaEGS.Helpers;
+﻿using Newtonsoft.Json;
 using Zatca.eInvoice.Helpers;
+using ZatcaEGS.Helpers;
 
 namespace ZatcaEGS.Models
 {
@@ -22,6 +21,10 @@ namespace ZatcaEGS.Models
         public int LastICV { get; set; } = 0;
         public string LastPIH { get; set; } = "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==";
 
+        public string DateCreated { get; set; }
+        public string BaseCurrency { get; set; }
+        public string BusinessDetails { get; set; }
+
         public RelayData() { }
 
         public RelayData(Dictionary<string, string> formData)
@@ -33,21 +36,16 @@ namespace ZatcaEGS.Models
 
             string DataString = JsonParser.UpdateJsonGuidValue(Data, ManagerCustomField.ZatcaUUIDGuid);
 
-            var (baseCurrency, businessDetails, dynamicParts) = JsonParser.ParseJson(DataString);
+            var (BaseCurrency, BusinessDetails, dynamicParts) = JsonParser.ParseJson(DataString);
 
-            var AccessToken = JsonParser.FindStringByGuid(businessDetails, ManagerCustomField.TokenInfoGuid);
+            var AccessToken = JsonParser.FindStringByGuid(BusinessDetails, ManagerCustomField.TokenInfoGuid);
 
-            var uri = new Uri(Referrer);
-            var baseUrl = $"{uri.Scheme}://{uri.Host}";
+            var icv = JsonParser.FindStringByGuid(BusinessDetails, ManagerCustomField.LastIcvGuid) ?? LastICV.ToString();
 
-            if (uri.Port != 80 && uri.Port != 443)
-            {
-                baseUrl += $":{uri.Port}";
-            }
+            LastICV = int.TryParse(icv, out int icvNumber) ? icvNumber : 0;
+            LastPIH = JsonParser.FindStringByGuid(BusinessDetails, ManagerCustomField.TokenInfoGuid) ?? LastPIH;
 
-            baseUrl += "/api2";
-
-            var certString = JsonParser.FindStringByGuid(businessDetails, ManagerCustomField.CertificateInfoGuid);
+            var certString = JsonParser.FindStringByGuid(BusinessDetails, ManagerCustomField.CertificateInfoGuid);
 
             if (!string.IsNullOrEmpty(certString))
             {
@@ -56,7 +54,7 @@ namespace ZatcaEGS.Models
                 if (certificateInfo != null)
                 {
                     certificateInfo.ApiSecret = AccessToken;
-                    certificateInfo.ApiEndpoint = baseUrl;
+                    certificateInfo.ApiEndpoint = UrlHelper.GetApiEndpoint(Referrer);
                     EnvironmentType = certificateInfo.EnvironmentType;
 
                     CertInfoString = ObjectCompressor.SerializeToBase64String(certificateInfo);
@@ -65,6 +63,7 @@ namespace ZatcaEGS.Models
 
             // Retrieve the JSON string associated with a specific GUID
             InvoiceJson = dynamicParts.GetValueOrDefault(Key);
+
             if (InvoiceJson != null)
             {
                 InvoiceJson = InvoiceJson.Replace("Customer", "InvoiceParty")
@@ -77,10 +76,6 @@ namespace ZatcaEGS.Models
                 // Merge json
                 InvoiceJson = JsonParser.ReplaceGuidValuesInJson(InvoiceJson, dynamicParts);
                 InvoiceJson = JsonParser.ReplaceGuidValuesInJson(InvoiceJson, dynamicParts);
-
-                // Display the modified JSON
-                //Console.WriteLine("\nModified JSON:");
-                //Console.WriteLine(InvoiceJson);
 
                 ManagerInvoice = JsonConvert.DeserializeObject<ManagerInvoice>(InvoiceJson);
 
@@ -99,12 +94,14 @@ namespace ZatcaEGS.Models
                 };
 
                 Base64QrCode = JsonParser.FindStringByGuid(InvoiceJson, ManagerCustomField.QrCodeGuid, "RefInvoice");
+                DateCreated = JsonParser.FindStringByGuid(InvoiceJson, ManagerCustomField.DateCreatedGuid, "RefInvoice");
 
                 if (!string.IsNullOrEmpty(Base64QrCode))
                 {
                     ApprovalStatus = JsonParser.FindStringByGuid(InvoiceJson, ManagerCustomField.ApprovedInvoiceGuid, "RefInvoice");
 
                     ZatcaUUID = JsonParser.FindStringByGuid(InvoiceJson, Key, ManagerCustomField.ZatcaUUIDGuid);
+
                     if (!string.IsNullOrEmpty(ZatcaUUID) && ZatcaUUID.Contains('#'))
                     {
                         ZatcaUUID = ZatcaUUID.Replace("#", "");

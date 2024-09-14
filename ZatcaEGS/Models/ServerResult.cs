@@ -74,7 +74,7 @@ namespace ZatcaEGS.Models
         [JsonProperty("invoiceHash")]
         public string InvoiceHash { get; set; }
 
-        [JsonProperty("message")]
+        [JsonProperty("Message")]
         public string Message { get; set; }
 
         [JsonProperty("qrBuyertStatus")]
@@ -102,7 +102,7 @@ namespace ZatcaEGS.Models
         [JsonProperty("category")]
         public string Category { get; set; }
 
-        [JsonProperty("message")]
+        [JsonProperty("Message")]
         public string Message { get; set; }
 
     }
@@ -128,8 +128,9 @@ namespace ZatcaEGS.Models
         // Properti umum untuk semua jenis respons
         public string RequestUri { get; set; }
         public string RequestType { get; set; }
-        public string HttpCode { get; set; }
+        public string StatusCode { get; set; }
         public string HttpMessage { get; set; }
+        public string Message { get; set; } // 303
 
         // Properti khusus untuk setiap jenis status kode
         public string MoreInformation { get; set; } // 401, 404, dll.

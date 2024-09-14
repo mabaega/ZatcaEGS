@@ -85,7 +85,6 @@ namespace ZatcaEGS.Helpers
         }
 
 
-
         public static string UpdateJsonGuidValue(string jsonString, string key)
         {
             JObject jsonObject = JObject.Parse(jsonString);
@@ -172,20 +171,20 @@ namespace ZatcaEGS.Helpers
             return null; // Return null if the key is not found.
         }
 
-        //find value by key inside section
-        public static string FindStringValueByKey(JToken token, string rootKey, string key)
-        {
-            if (token == null || string.IsNullOrEmpty(rootKey) || string.IsNullOrEmpty(key))
-                return null;
+        ////find value by key inside section
+        //public static string FindStringValueByKey(JToken token, string rootKey, string key)
+        //{
+        //    if (token == null || string.IsNullOrEmpty(rootKey) || string.IsNullOrEmpty(key))
+        //        return null;
 
-            // Find the rootKey first
-            var rootToken = token.SelectToken(rootKey);
-            if (rootToken == null)
-                return null;
+        //    // Find the rootKey first
+        //    var rootToken = token.SelectToken(rootKey);
+        //    if (rootToken == null)
+        //        return null;
 
-            // Now search for the key within the rootKey
-            return FindValueByKey(rootToken, key);
-        }
+        //    // Now search for the key within the rootKey
+        //    return FindValueByKey(rootToken, key);
+        //}
 
         public static string FindValueByKey(JToken token, string key)
         {

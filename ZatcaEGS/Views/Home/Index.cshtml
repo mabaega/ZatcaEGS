@@ -56,3 +56,99 @@
     </div>
 </div>
 
+@* <div>
+<button id="testButton">Test API</button>
+<pre id="response"></pre> <!-- To display the API response -->
+</div>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('testButton').addEventListener('click', function () {
+            // URL and API Key
+            const url = 'http://127.0.0.1:55667/api2/folder-form/a1b2c3d4-e5f6-4abc-8def-abcdef000909';
+            const apiKey = 'CgVlVGVzdBISCZaStNzE7YJPEakeV7sJVk7TGhIJS/pLaayJAkQRrGYLBHbm8lg=';
+
+            // Payload for the API request
+            const payload = {
+                "Description": "ZatcaReference",
+                "CustomFields": {},
+                "CustomFields2": {
+                    "Strings": {
+                        "a1b2c3d4-e5f6-4abc-8def-abcdef000002": "10",
+                        "a1b2c3d4-e5f6-4abc-8def-abcdef000003": "UhoihB6jGYwRdVq6u/H3ga/qukbGO+g4zn5vRpoUBYA="
+                    },
+                    "Decimals": {},
+                    "Dates": {},
+                    "Booleans": {},
+                    "StringArrays": {}
+                },
+                "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000909"
+            };
+
+            // Perform the Fetch request
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': apiKey
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text(); // Use response.text() for empty responses
+                    } else {
+                        throw new Error('Network response was not ok.');
+                    }
+                })
+                .then(text => {
+                    if (text.trim() === '') {
+                        document.getElementById('response').textContent = 'Request successful, no content returned.';
+                    } else {
+                        try {
+                            // Attempt to parse JSON if content is available
+                            const jsonResponse = JSON.parse(text);
+                            document.getElementById('response').textContent = JSON.stringify(jsonResponse, null, 2);
+                        } catch (e) {
+                            // Handle JSON parsing errors
+                            document.getElementById('response').textContent = `Response received but failed to parse as JSON: ${text}`;
+                        }
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('response').textContent = `Error: ${error.message}`;
+                });
+        });
+    });
+</script> *@
+
+@* 
+<div>
+<button id="testButton2">Test API2</button>
+
+<div id="response2"></div>
+</div>
+
+<script>
+    document.getElementById('testButton2').addEventListener('click', function () {
+        fetch('http://127.0.0.1:55667/api2/access-tokens', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-API-KEY': 'CgVlVGVzdBISCZaStNzE7YJPEakeV7sJVk7TGhIJS/pLaayJAkQRrGYLBHbm8lg='
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('response2').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                document.getElementById('response2').innerText = 'Error: ' + error.message;
+            });
+    });
+</script> *@

@@ -5,11 +5,11 @@ using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
-using ZatcaEGS.Helpers;
-using ZatcaEGS.Models;
 using Zatca.eInvoice;
 using Zatca.eInvoice.Helpers;
 using Zatca.eInvoice.Models;
+using ZatcaEGS.Helpers;
+using ZatcaEGS.Models;
 
 namespace ZatcaEGS.Controllers
 {
@@ -29,7 +29,7 @@ namespace ZatcaEGS.Controllers
 
             var existingModel = new CertificateInfo()
             {
-                ApiEndpoint = "",
+                ApiEndpoint = "http://127.0.0.1:55667/api2",
                 ApiSecret = "",
 
                 IdentificationID = "1010010000",
@@ -55,6 +55,8 @@ namespace ZatcaEGS.Controllers
         [HttpPost]
         public IActionResult Finish(CertificateInfo model)
         {
+            TempData.Clear();
+
             if (ModelState.IsValid && !string.IsNullOrEmpty(model.PCSIDBinaryToken))
             {
                 using (var memoryStream = new MemoryStream())
@@ -96,40 +98,25 @@ namespace ZatcaEGS.Controllers
                         }
                     }
 
+                    TempData["Certificate"] = ObjectCompressor.SerializeToBase64String(model);
+                    TempData["LastICV"] = "0";
+                    TempData["LastPIH"] = "";
+
                     return File(memoryStream.ToArray(), MediaTypeNames.Application.Zip, $"{model.CsrCommonName}_{model.EnvironmentType}.zip");
+
                 }
             }
             return View("Index", model);
         }
 
 
-        //[HttpPost]
-        //public IActionResult Finish(CertificateInfo model)
-        //{
-        //    if (ModelState.IsValid && !string.IsNullOrEmpty(model.PCSIDBinaryToken))
-        //    {
-        //        string certificateInfo = $"\nManager Certificate Info:\n\n";
-        //        certificateInfo += $"{ObjectCompressor.SerializeToBase64String(model)}\n\n";
-
-        //        certificateInfo += $"\nOnboarding Device Info:\n\n";
-        //        foreach (var property in model.GetType().GetProperties())
-        //        {
-        //            if (property.Name != "ApiSecret" && property.Name != "ApiEndpoint")
-        //            {
-        //                certificateInfo += $"{property.Name}: \n{property.GetValue(model)}\n\n";
-        //            }
-        //        }
-
-        //        byte[] certificateBytes = Encoding.UTF8.GetBytes(certificateInfo);
-        //        var contentType = "application/octet-stream";
-        //        var fileName = $"{model.CsrCommonName}_{model.EnvironmentType}.txt";
-
-        //        return File(certificateBytes, contentType, fileName);
-        //    }
-
-        //    return View("Index", model);
-        //}
-
+        [HttpGet("GetCfData")]
+        public string CustomFieldJson()
+        {
+            byte[] jsonDataBytes = ZatcaEGS.Properties.Resources.cfData;
+            string jsonData = Encoding.UTF8.GetString(jsonDataBytes);
+            return jsonData;
+        }
 
         [HttpPost("generatecf")]
         public async Task<IActionResult> GenerateCustomFieldAsync([FromBody] AccessTokenDto token)
@@ -173,7 +160,7 @@ namespace ZatcaEGS.Controllers
 
                             result.AppendLine(nameValue + " " + responseMessage);
 
-                            await Task.Delay(100); // Use Task.Delay for async delay
+                            await Task.Delay(10); // Use Task.Delay for async delay
                         }
                     }
                     return Ok(result.ToString());
@@ -300,7 +287,7 @@ namespace ZatcaEGS.Controllers
             {
 
                 //Invoice Compliance Check
-                ComplianceTest ct = new ComplianceTest(model, model.CCSIDBinaryToken, model.EcSecp256k1Privkeypem);
+                ComplianceCheckHelper ct = new ComplianceCheckHelper(model, model.CCSIDBinaryToken, model.EcSecp256k1Privkeypem);
                 string invoiceHash = null;
                 int iICV = 0;
 

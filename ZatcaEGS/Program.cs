@@ -25,6 +25,7 @@ if (portArg != null && int.TryParse(portArg, out int parsedPort))
             //{
             //    listenOptions.UseHttps();
             //});
+
             options.Listen(System.Net.IPAddress.Any, parsedPort); // HTTP
         });
     }

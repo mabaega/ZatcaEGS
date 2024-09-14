@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualBasic;
-using ZatcaEGS.Models;
 using Zatca.eInvoice.Helpers;
 using Zatca.eInvoice.Models;
+using ZatcaEGS.Models;
 using static ZatcaEGS.Helpers.VATInfoHelper;
 
 namespace ZatcaEGS.Helpers
@@ -40,13 +40,25 @@ namespace ZatcaEGS.Helpers
 
             string invoiceSubType = JsonParser.FindStringByGuid(_relayData.InvoiceJson, ManagerCustomField.InvoiceSubTypeGuid, "RefInvoice") ?? "0200000";
 
+            string dateCreated = null;
+            string timeCreated = null;
+
+            if (!string.IsNullOrEmpty(_relayData.DateCreated) && _relayData.DateCreated.Contains(' '))
+            {
+                var dateTimeParts = _relayData.DateCreated.Split(' ');
+                dateCreated = dateTimeParts[0];
+                timeCreated = dateTimeParts[1];
+            }
+
             Invoice invoice = new()
             {
                 ProfileID = "reporting:1.0",
                 ID = new ID(_managerInvoice.Reference),
                 UUID = _relayData.ZatcaUUID,
-                IssueDate = _managerInvoice.IssueDate.ToString("yyyy-MM-dd"),
-                IssueTime = "00:00:00",
+
+                IssueDate = dateCreated ?? _managerInvoice.IssueDate.ToString("yyyy-MM-dd"),
+                IssueTime = timeCreated ?? "00:00:00",
+
                 InvoiceTypeCode = new InvoiceTypeCode((InvoiceType)invoiceType, invoiceSubType),
                 DocumentCurrencyCode = _invoiceCurrencyCode,
                 TaxCurrencyCode = _taxCurrencyCode
