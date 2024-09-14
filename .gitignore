@@ -371,3 +371,6 @@ FodyWeavers.xsd
 /XmlValidationTest
 /ZatcaEGS/Properties/PublishProfiles/ZatcaEGS - Web Deploy.pubxml
 /ZatcaEGS/Properties/PublishProfiles/FolderProfile.pubxml
+/ZatcaEGS/cfData - Copy.json
+/ZatcaEGS/ScriptReference.txt
+/ZatcaEGS/Helpers/ZatcaReference.cs
