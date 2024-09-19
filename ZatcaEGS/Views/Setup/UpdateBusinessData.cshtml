@@ -1,0 +1,134 @@
+﻿@model ZatcaEGS.Models.SetupViewModel
+
+@{
+    Layout = "_Layout"; // Ensure this is set to your layout file if you have one
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+        <div class="card shadow-lg p-4 mb-5 rounded" style="max-width: 800px; width: 100%;">
+            <h3 class="text-center mb-2">Business Data Setup</h3>
+            <hr />
+            
+            <p class="text-center mb-4">
+                You have been redirected to this page to update Manager business data to align with the latest requirements from Zatca or Manager. Please click "Update" to proceed with the updates.
+            </p>
+
+            <hr />
+
+            <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary btn-lg" style="width: 48%;" onclick="window.location.href='@Model.Referrer'">Back to Manager</button>
+                <button id="updateData" class="btn btn-primary btn-lg" style="width: 48%;">Update</button>
+            </div>
+
+            <div class="loading-indicator" id="loadingIndicator">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function showLoading() {
+        document.getElementById('loadingIndicator').style.display = 'block';
+    }
+
+    function hideLoading() {
+        document.getElementById('loadingIndicator').style.display = 'none';
+    }
+
+    function showAlert(message) {
+        alert(message);
+    }
+
+    $("#updateData").on('click', async function () {
+        showLoading();
+
+        const apiEndpoint = '@Model.Api';
+        const apiSecret = '@Model.Token';
+
+        if (!apiEndpoint || !apiSecret) {
+            hideLoading();
+            showAlert('API Endpoint or API Secret cannot be empty. Please provide valid values.');
+            return;
+        }
+
+        let allMessages = '';
+
+        try {
+            const response = await fetch('/setup/GetCfData');
+            if (!response.ok) throw new Error('Failed to fetch JSON data');
+
+            const jsonObject = await response.json();
+            let successCount = 0;
+            let failureCount = 0;
+
+            for (const entry of jsonObject.jsondata) {
+                const apiPath = entry.apipath;
+                const key = entry.data.Key;
+                const fullApiUrl = `${apiEndpoint}${apiPath}/${encodeURIComponent(key)}`;
+
+                try {
+                    const result = await fetch(fullApiUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiSecret}`
+                        },
+                        body: JSON.stringify(entry.data)
+                    });
+
+                    if (result.ok) {
+                        allMessages += `Data sent successfully to ${fullApiUrl}\n`;
+                        successCount++;
+                    } else {
+                        allMessages += `Failed to send data to ${fullApiUrl}\n`;
+                        failureCount++;
+                    }
+                } catch (err) {
+                    allMessages += `Error sending data to ${fullApiUrl}: ${err}\n`;
+                    failureCount++;
+                }
+            }
+
+            // Update BusinessDetails
+            const businessDetails = @Html.Raw(Json.Serialize(Model.BusinessDetailsJson));
+            const apiUrl = `${apiEndpoint}/business-details-form/38cf4712-6e95-4ce1-b53a-bff03edad273`;
+            const secretKey = apiSecret;
+
+            try {
+                const payload = JSON.parse(businessDetails);
+                console.log('Parsed Payload:', payload);
+
+                const result = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${secretKey}`
+                    },
+                    body: payload // No additional JSON.stringify needed
+                });
+
+                const responseText = await result.text();
+                if (result.ok) {
+                    allMessages += 'Update Zatca Reference successful!\n';
+                } else {
+                    allMessages += `Update Zatca Reference Error: Network response was not ok. ${responseText}\n`;
+                }
+            } catch (error) {
+                allMessages += `Error parsing businessDetails JSON: ${error.message}\n`;
+            }
+
+            hideLoading();
+            if (!allMessages) {
+                showAlert('No data was processed.');
+            } else {
+                showAlert(allMessages);
+            }
+        } catch (error) {
+            hideLoading();
+            showAlert('An error occurred while processing: ' + error.message);
+        }
+    });
+</script>

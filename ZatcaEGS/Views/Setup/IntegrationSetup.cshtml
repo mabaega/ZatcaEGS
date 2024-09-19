@@ -1,24 +1,33 @@
 ﻿@using Zatca.eInvoice.Helpers
-@model ZatcaEGS.Models.CertificateInfo
+@model ZatcaEGS.Models.SetupViewModel
 
-@{
-    ViewData["Title"] = "Device Setup";
-}
 
 <div class="col-md-10 offset-md-1">
 
     <div class="card" id="wizardProfile">
 
-        <form id="certInfoForm" asp-action="Finish" method="post">
+        <form id="certInfoForm" action="/Setup/Finish" method="post">
+            <input type="hidden" name="Referrer" value="@Model.Referrer" />
+            <input type="hidden" name="BusinessDetails" value="@Model.BusinessDetails" />
+            <input type="hidden" name="Api" value="@Model.Api" />
+            <input type="hidden" name="Token" value="@Model.Token" />
+
+            <input type="hidden" id="isFileReady" value="@Model.IsFileReady.ToString().ToLower()" />
+            <input type="hidden" id="fileData" value="@Model.FileContent" />
+            <input type="hidden" name="Filename" value="@Model.Filename" />
+
+            <input type="hidden" id="ApiEndpoint" name="ApiEndpoint" value="@Model.CertificateInfo.ApiEndpoint" />
+            <input type="hidden" id="ApiSecret" name="ApiSecret" value="@Model.CertificateInfo.ApiSecret" />
 
             <div class="card-header text-center">
                 <h4 class="card-title">Manager - Zatca Integration</h4>
                 <h5 class="card-description">Device Setup and Registration</h5>
             </div>
+
             <div class="wizard-navigation" id="wizardNav">
                 <ul class="nav nav-pills nav-fill gap-3 p-2 small bg-transparent rounded-1 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-pills-link-active-bg: var(--bs-tertiary-bg); --bs-nav-link-color: var(--bs-secondary);">
                     <li class="nav-item">
-                        <a class="nav-link rounded-5 active" data-bs-toggle="pill" href="#managerDataField" role="tab">Manager CustomFields</a>
+                        <a class="nav-link rounded-5 active" data-bs-toggle="pill" href="#managerDataField" role="tab">Business Data Setup</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link rounded-5" data-bs-toggle="pill" href="#businessInfo" role="tab">Business Info</a>
@@ -32,64 +41,48 @@
                 </ul>
             </div>
 
-            <input type="hidden" name="RelayURL" value="@Model.RelayURL" />
 
             <div class="card-body">
                 <div class="tab-content">
                     <div class="tab-pane fade active show" id="managerDataField" role="tabpanel">
-                        @* <h5 class="info-text">Manager Data Field</h5> *@
-                        <div class="row text-center">
-
-                            <div class="col-md-12 mb-2 mt-2 form-label">
-                                <div class="border border-tertiary rounded p-3">
-                                    <p>
-                                        This wizard will help you set up your Manager.io business data, create a business CSR, obtain a Compliance CSID, perform Compliance Checks, and get a Production CSID (Onboarding). Make sure to fill in all the inputs correctly.
+                        <!-- Business Data Setup Section -->
+                        <div class="row text-center mt-2">
+                            <div class="col-md-12">
+                                <div class="border border-tertiary rounded p-4">
+                                    <p class="mb-1">
+                                        <span style="font-weight: bold;">Business Data Setup</span>
                                     </p>
-                                    <p id="infoContent">
-                                        The output of this wizard is a text file containing the business configuration and devices registered with the Zatca server. <br />
-                                        <b>
-                                            You must copy the Manager Certificate Info from this file into your Business Details data in Manager.
-                                        </b>
-                                        <br />
-                                        And add the relay URL: <b>@Model.RelayURL</b>  to your invoice.
+                                    <hr />
+                                    <p class="mb-2">
+                                        This page will help you create or update custom fields and footers required in Manager with Zatca Integration. <br />
                                     </p>
-                                    <p>
-                                        This application does not store user data. Save the file carefully, as you may need it later.
-                                    </p>
-                                    <p>
-                                        Ensure you use the Simulation environment first to verify that everything works correctly. Once you are confident, you can proceed to the next step in the Production environment.
-                                    </p>
+                                    <div class="mt-3 text-center">
+                                        <button type="button" id="generateCustomField" class="btn btn-outline-primary btn-sm">Update Business Data</button>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
-                        <div class="row text-start">
 
-                            <div class="col-md-12 mb-3 mt-3">
-                                <div class="border border-tertiary rounded p-3">
-
-                                    <div class="row">
-                                        <div class="col-md-5 mb-3">
-                                            <div class="form-group">
-                                                <label class="form-label" asp-for="ApiEndpoint">ApiEndpoint</label>
-                                                <input asp-for="ApiEndpoint" class="form-control form-control-sm" placeholder="Enter API Endpoint" />
-                                                <span asp-validation-for="ApiEndpoint" class="text-danger"></span>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-7 mb-3">
-                                            <div class="form-group">
-                                                <label class="form-label" asp-for="ApiSecret">Secret</label>
-                                                <input asp-for="ApiSecret" class="form-control form-control-sm" autocomplete="off" placeholder="Enter API Secret" />
-                                                <span asp-validation-for="ApiSecret" class="text-danger"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-12 mb-1 text-end">
-                                        <button type="button" id="generateCustomField" class="btn btn-outline-success btn-sm">Cerate/Update CustomField</button>
-                                    </div>
-
+                        <!-- Steps for eInvoice Generation Section -->
+                        <div class="row text-center mt-2">
+                            <div class="col-md-12">
+                                <div class="border border-tertiary rounded p-4">
+                                    <p class="mb-1">
+                                        <span style="font-weight: bold;">The next step is to register the EGS according to your Business Tax Information.</span>
+                                    </p>
+                                    <hr />
+                                    <p class="mb-2">
+                                        <span style="font-weight: bold;">Generate CSR and Private Key:</span><br />
+                                        Enter your business data correctly. This data will be used to create the CSR and Private Key, and it will also appear on the eInvoice XML generated by ZatcaEGS.
+                                    </p>
+                                    <p class="mb-2">
+                                        <span style="font-weight: bold;">Get CCSID:</span><br />
+                                        Make sure you have an OTP to get a Compliant CSID. Log in to the Fatoora Portal using your VAT number and generate an OTP there.
+                                    </p>
+                                    <p class="mb-2">
+                                        <span style="font-weight: bold;">Get PCSID:</span><br />
+                                        The PCSID is the certificate used to sign the invoice before reporting it to the Fatoora portal. After completing this process, your onboarded devices should be listed on the Fatoora portal, indicating successful integration.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -105,99 +98,99 @@
 
                                         <div class="col-md-12 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="RegistrationName">Registration Name</label>
-                                                <input asp-for="RegistrationName" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="RegistrationName" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.RegistrationName">Registration Name</label>
+                                                <input asp-for="@Model.CertificateInfo.RegistrationName" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.RegistrationName" class="text-danger"></span>
                                             </div>
                                         </div>
 
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CompanyID">Company ID</label>
-                                                <input asp-for="CompanyID" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="CompanyID" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CompanyID">Company ID</label>
+                                                <input asp-for="@Model.CertificateInfo.CompanyID" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.CompanyID" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="TaxSchemeID">Tax Scheme ID</label>
-                                                <input asp-for="TaxSchemeID" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="TaxSchemeID" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.TaxSchemeID">Tax Scheme ID</label>
+                                                <input asp-for="@Model.CertificateInfo.TaxSchemeID" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.TaxSchemeID" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="IdentificationID">Business Identification ID</label>
-                                                <input asp-for="IdentificationID" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="IdentificationID" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.IdentificationID">Business Identification ID</label>
+                                                <input asp-for="@Model.CertificateInfo.IdentificationID" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.IdentificationID" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="IdentificationScheme">Identification Scheme</label>
-                                                <input asp-for="IdentificationScheme" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="IdentificationScheme" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.IdentificationScheme">Identification Scheme</label>
+                                                <input asp-for="@Model.CertificateInfo.IdentificationScheme" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.IdentificationScheme" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-12 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="StreetName">Street Name</label>
-                                                <input asp-for="StreetName" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="StreetName" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.StreetName">Street Name</label>
+                                                <input asp-for="@Model.CertificateInfo.StreetName" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.StreetName" class="text-danger"></span>
                                             </div>
                                         </div>
 
 
                                         <div class="col-md-6 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CitySubdivisionName">City Subdivision Name</label>
-                                                <input asp-for="CitySubdivisionName" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="CitySubdivisionName" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CitySubdivisionName">City Subdivision Name</label>
+                                                <input asp-for="@Model.CertificateInfo.CitySubdivisionName" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.CitySubdivisionName" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-6 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CityName">City Name</label>
-                                                <input asp-for="CityName" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="CityName" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CityName">City Name</label>
+                                                <input asp-for="@Model.CertificateInfo.CityName" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.CityName" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="BuildingNumber">Building Number</label>
-                                                <input asp-for="BuildingNumber" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="BuildingNumber" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.BuildingNumber">Building Number</label>
+                                                <input asp-for="@Model.CertificateInfo.BuildingNumber" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.BuildingNumber" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="PostalZone">Postal Zone</label>
-                                                <input asp-for="PostalZone" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="PostalZone" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.PostalZone">Postal Zone</label>
+                                                <input asp-for="@Model.CertificateInfo.PostalZone" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.PostalZone" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CountryIdentificationCode">Country Identification Code</label>
-                                                <input asp-for="CountryIdentificationCode" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="CountryIdentificationCode" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CountryIdentificationCode">Country Identification Code</label>
+                                                <input asp-for="@Model.CertificateInfo.CountryIdentificationCode" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.CountryIdentificationCode" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="BusinessCategory">Business Category</label>
-                                                <input asp-for="BusinessCategory" class="form-control form-control-sm readonly-control" />
-                                                <span asp-validation-for="BusinessCategory" class="text-danger"></span>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.BusinessCategory">Business Category</label>
+                                                <input asp-for="@Model.CertificateInfo.BusinessCategory" class="form-control form-control-sm readonly-control" />
+                                                <span asp-validation-for="@Model.CertificateInfo.BusinessCategory" class="text-danger"></span>
                                             </div>
                                         </div>
 
@@ -219,72 +212,72 @@
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CsrIndustryBusinessCategory"></label>
-                                                <input asp-for="CsrIndustryBusinessCategory" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CsrIndustryBusinessCategory"></label>
+                                                <input asp-for="@Model.CertificateInfo.CsrIndustryBusinessCategory" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CsrCommonName"></label>
-                                                <input asp-for="CsrCommonName" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CsrCommonName"></label>
+                                                <input asp-for="@Model.CertificateInfo.CsrCommonName" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
                                         <div class="col-md-6 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CsrSerialNumber"></label>
-                                                <input asp-for="CsrSerialNumber" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CsrSerialNumber"></label>
+                                                <input asp-for="@Model.CertificateInfo.CsrSerialNumber" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CsrOrganizationIdentifier"></label>
-                                                <input asp-for="CsrOrganizationIdentifier" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CsrOrganizationIdentifier"></label>
+                                                <input asp-for="@Model.CertificateInfo.CsrOrganizationIdentifier" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CsrOrganizationUnitName"></label>
-                                                <input asp-for="CsrOrganizationUnitName" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CsrOrganizationUnitName"></label>
+                                                <input asp-for="@Model.CertificateInfo.CsrOrganizationUnitName" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
                                         <div class="col-md-6 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CsrOrganizationName"></label>
-                                                <input asp-for="CsrOrganizationName" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CsrOrganizationName"></label>
+                                                <input asp-for="@Model.CertificateInfo.CsrOrganizationName" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CsrCountryName"></label>
-                                                <input asp-for="CsrCountryName" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CsrCountryName"></label>
+                                                <input asp-for="@Model.CertificateInfo.CsrCountryName" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CsrInvoiceType"></label>
-                                                <input asp-for="CsrInvoiceType" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CsrInvoiceType"></label>
+                                                <input asp-for="@Model.CertificateInfo.CsrInvoiceType" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CsrLocationAddress"></label>
-                                                <input asp-for="CsrLocationAddress" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CsrLocationAddress"></label>
+                                                <input asp-for="@Model.CertificateInfo.CsrLocationAddress" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label style="color: var(--bs-success);" class="form-label" asp-for="EnvironmentType">CSR Environment Type</label>
-                                                <select id="EnvironmentType" asp-for="EnvironmentType" class="form-control form-control-sm">
+                                                <label style="color: var(--bs-success);" class="form-label" asp-for="@Model.CertificateInfo.EnvironmentType">CSR Environment Type</label>
+                                                <select id="EnvironmentType" asp-for="@Model.CertificateInfo.EnvironmentType" class="form-control form-control-sm">
                                                     @foreach (var value in Enum.GetValues(typeof(EnvironmentType)))
                                                     {
                                                         <option value="@value">@value</option>
@@ -301,15 +294,15 @@
 
                                         <div class="col-md-12 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="GeneratedCSR">Generated CSR</label>
-                                                <textarea id="GeneratedCSR" asp-for="GeneratedCSR" class="form-control form-control-sm" readonly></textarea>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.GeneratedCSR">Generated CSR</label>
+                                                <textarea id="GeneratedCSR" asp-for="@Model.CertificateInfo.GeneratedCSR" class="form-control form-control-sm" readonly></textarea>
                                             </div>
                                         </div>
 
                                         <div class="col-md-12 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="EcSecp256k1Privkeypem">Generated EC Secp256k1 Private Key (PEM)</label>
-                                                <textarea id="EcSecp256k1Privkeypem" asp-for="EcSecp256k1Privkeypem" class="form-control form-control-sm" readonly></textarea>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.EcSecp256k1Privkeypem">Generated EC Secp256k1 Private Key (PEM)</label>
+                                                <textarea id="EcSecp256k1Privkeypem" asp-for="@Model.CertificateInfo.EcSecp256k1Privkeypem" class="form-control form-control-sm" readonly></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -344,24 +337,24 @@
                                         <!-- CCSID Binary Token -->
                                         <div class="col-md-12 mb-3 mt-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CCSIDBinaryToken">CCSID Binary Token</label>
-                                                <textarea asp-for="CCSIDBinaryToken" class="form-control form-control-sm" readonly></textarea>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CCSIDBinaryToken">CCSID Binary Token</label>
+                                                <textarea asp-for="@Model.CertificateInfo.CCSIDBinaryToken" class="form-control form-control-sm" readonly></textarea>
                                             </div>
                                         </div>
 
                                         <!-- Token Secret -->
                                         <div class="col-md-6 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CCSIDSecret">Token Secret</label>
-                                                <input asp-for="CCSIDSecret" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CCSIDSecret">Token Secret</label>
+                                                <input asp-for="@Model.CertificateInfo.CCSIDSecret" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
                                         <!-- Request ID -->
                                         <div class="col-md-4 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="CCSIDComplianceRequestId">Request ID</label>
-                                                <input asp-for="CCSIDComplianceRequestId" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.CCSIDComplianceRequestId">Request ID</label>
+                                                <input asp-for="@Model.CertificateInfo.CCSIDComplianceRequestId" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
@@ -375,24 +368,24 @@
                                         <!-- PCSID Binary Token -->
                                         <div class="col-md-12 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="PCSIDBinaryToken">PCSID Binary Token</label>
-                                                <textarea asp-for="PCSIDBinaryToken" class="form-control form-control-sm" readonly></textarea>
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.PCSIDBinaryToken">PCSID Binary Token</label>
+                                                <textarea asp-for="@Model.CertificateInfo.PCSIDBinaryToken" class="form-control form-control-sm" readonly></textarea>
                                             </div>
                                         </div>
 
                                         <!-- PCSID Secret -->
                                         <div class="col-md-6 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="PCSIDSecret">PCSID Secret</label>
-                                                <input asp-for="PCSIDSecret" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.PCSIDSecret">PCSID Secret</label>
+                                                <input asp-for="@Model.CertificateInfo.PCSIDSecret" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
                                         <!-- Registered Date -->
                                         <div class="col-md-3 mb-3">
                                             <div class="form-group">
-                                                <label class="form-label" asp-for="RegisteredDate">Registered Date</label>
-                                                <input asp-for="RegisteredDate" type="datetime-local" class="form-control form-control-sm" readonly />
+                                                <label class="form-label" asp-for="@Model.CertificateInfo.RegisteredDate">Registered Date</label>
+                                                <input asp-for="@Model.CertificateInfo.RegisteredDate" type="datetime-local" class="form-control form-control-sm" readonly />
                                             </div>
                                         </div>
 
@@ -409,7 +402,10 @@
 
             <div class="card-footer">
 
+                <button type="button" class="btn btn-outline-secondary btn-sm" name="backToManager" onclick="window.location.href='@Model.Referrer'">Back to Manager</button>
+
                 <button type="button" class="btn btn-outline-secondary btn-sm" name="previous">Previous</button>
+
 
                 <button type="button" class="btn btn-outline-secondary btn-sm ml-auto" name="next">Next</button>
 
@@ -418,6 +414,7 @@
             </div>
 
         </form>
+
     </div>
 </div>
 
@@ -425,6 +422,7 @@
 
 
 @section Scripts {
+
     <script>
         $(function () {
             var $tabs = $('.tab-pane');
@@ -440,40 +438,45 @@
             }
 
             function updateButtons() {
-                $('[name="previous"]').toggleClass('d-none', currentIndex === 0);
-                $('[name="next"]').toggleClass('d-none', currentIndex === $tabs.length - 1);
-                $('[name="finish"]').toggleClass('d-none', currentIndex !== $tabs.length - 1);
+                var isFirstTab = currentIndex === 0;
+                var isLastTab = currentIndex === $tabs.length - 1;
+
+                $('[name="previous"]').toggleClass('d-none', isFirstTab);
+                $('[name="next"]').toggleClass('d-none', isLastTab);
+                $('[name="finish"]').toggleClass('d-none', !isLastTab);
+                $('[name="backToManager"]').toggleClass('d-none', !isFirstTab);
+
                 $navLinks.removeClass('active');
                 $navLinks.eq(currentIndex).addClass('active');
             }
 
             function handleTabShown(tabId) {
                 if (tabId === "csrConfig") {
-                    var identificationIdValue = $("#IdentificationID").val();
+                    var identificationIdValue = $("#CertificateInfo_IdentificationID").val();
 
                     // Autofill CSR Common Name
                     if (identificationIdValue) {
-                        var csrCommonName = "MNG-" + identificationIdValue + "-" + $("#CompanyID").val();
-                        $("#CsrCommonName").val(csrCommonName);
+                        var csrCommonName = "MNG-" + identificationIdValue + "-" + $("#CertificateInfo_CompanyID").val();
+                        $("#CertificateInfo_CsrCommonName").val(csrCommonName);
                     }
 
                     // Autofill CSR Serial Number
-                    var csrSerialNumberInput = $("#CsrSerialNumber").val();
+                    var csrSerialNumberInput = $("#CertificateInfo_CsrSerialNumber").val();
                     var guidPattern = /\b[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/;
 
                     if (!csrSerialNumberInput || !guidPattern.test(csrSerialNumberInput)) {
                         var uuid = uuidv4();
                         var csrSerialNumber = "1-EGS|2-MNG|3-" + uuid;
-                        $("#CsrSerialNumber").val(csrSerialNumber);
+                        $("#CertificateInfo_CsrSerialNumber").val(csrSerialNumber);
                     }
 
-                    $("#CsrOrganizationIdentifier").val($("#CompanyID").val());
-                    $("#CsrOrganizationUnitName").val($("#CityName").val());
-                    $("#CsrOrganizationName").val($("#RegistrationName").val());
-                    $("#CsrCountryName").val($("#CountryIdentificationCode").val());
-                    $("#CsrInvoiceType").val("1100");
-                    $("#CsrLocationAddress").val($("#PostalZone").val());
-                    $("#CsrIndustryBusinessCategory").val($("#BusinessCategory").val());
+                    $("#CertificateInfo_CsrOrganizationIdentifier").val($("#CertificateInfo_CompanyID").val());
+                    $("#CertificateInfo_CsrOrganizationUnitName").val($("#CertificateInfo_CityName").val());
+                    $("#CertificateInfo_CsrOrganizationName").val($("#CertificateInfo_RegistrationName").val());
+                    $("#CertificateInfo_CsrCountryName").val($("#CertificateInfo_CountryIdentificationCode").val());
+                    $("#CertificateInfo_CsrInvoiceType").val("1100");
+                    $("#CertificateInfo_CsrLocationAddress").val($("#CertificateInfo_PostalZone").val());
+                    $("#CertificateInfo_CsrIndustryBusinessCategory").val($("#CertificateInfo_BusinessCategory").val());
                 }
             }
 
@@ -538,7 +541,8 @@
                         return;
                     }
 
-                    const response = await fetch('/GetCfData');
+                    const response = await fetch('/setup/GetCfData');
+
                     if (!response.ok) {
                         hideLoading();
                         alert('Failed to fetch JSON data');
@@ -555,12 +559,14 @@
                         const key = entry.data.Key;
                         const fullApiUrl = `${apiEndpoint}${apiPath}/${encodeURIComponent(key)}`;
 
+                        console.log(apiSecret);
+
                         try {
                             const result = await fetch(fullApiUrl, {
                                 method: 'PUT',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${secretKey}`//'X-API-KEY': apiSecret
+                                    'Authorization': `Bearer ${apiSecret}`//'X-API-KEY': apiSecret
                                 },
                                 body: JSON.stringify(entry.data)
                             });
@@ -594,15 +600,15 @@
             $('#generateCSRButton').on('click', function () {
                 showLoading();
                 var csrData = {
-                    CommonName: $('#CsrCommonName').val(),
-                    SerialNumber: $('#CsrSerialNumber').val(),
-                    OrganizationIdentifier: $('#CsrOrganizationIdentifier').val(),
-                    OrganizationUnitName: $('#CsrOrganizationUnitName').val(),
-                    OrganizationName: $('#CsrOrganizationName').val(),
-                    CountryName: $('#CsrCountryName').val(),
-                    InvoiceType: $('#CsrInvoiceType').val(),
-                    LocationAddress: $('#CsrLocationAddress').val(),
-                    IndustryBusinessCategory: $('#CsrIndustryBusinessCategory').val()
+                    CommonName: $('#CertificateInfo_CsrCommonName').val(),
+                    SerialNumber: $('#CertificateInfo_CsrSerialNumber').val(),
+                    OrganizationIdentifier: $('#CertificateInfo_CsrOrganizationIdentifier').val(),
+                    OrganizationUnitName: $('#CertificateInfo_CsrOrganizationUnitName').val(),
+                    OrganizationName: $('#CertificateInfo_CsrOrganizationName').val(),
+                    CountryName: $('#CertificateInfo_CsrCountryName').val(),
+                    InvoiceType: $('#CertificateInfo_CsrInvoiceType').val(),
+                    LocationAddress: $('#CertificateInfo_CsrLocationAddress').val(),
+                    IndustryBusinessCategory: $('#CertificateInfo_CsrIndustryBusinessCategory').val()
                 };
 
                 var environmentType = $('#EnvironmentType').val(); // Get the environment type value
@@ -614,7 +620,7 @@
                 }
 
                 $.ajax({
-                    url: '/generatecsr?environmentType=' + environmentType, // Include environment type in the query string
+                    url: 'generatecsr?environmentType=' + environmentType, // Include environment type in the query string
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(csrData),
@@ -639,22 +645,25 @@
                 var formData = new FormData($('#certInfoForm')[0]);
                 formData.append('OTP', $("#CCSIDOTP").val());
 
-                if (!formData.get('GeneratedCSR') || !formData.get('OTP')) {
+                var otp = $("#CCSIDOTP").val();
+                var csr = $("#GeneratedCSR").val();
+
+                if (!otp || !csr) {
                     hideLoading();
                     alert("Please provide all required inputs.");
                     return;
                 }
 
                 $.ajax({
-                    url: '@Url.Action("GetCCSID", "Wizard")',
+                    url: '@Url.Action("GetCCSID", "setup")',
                     type: 'POST',
                     processData: false,
                     contentType: false,
                     data: formData,
                     success: function (response) {
-                        $("#CCSIDBinaryToken").val(response.ccsidBinaryToken);
-                        $("#CCSIDSecret").val(response.ccsidSecret);
-                        $("#CCSIDComplianceRequestId").val(response.ccsidComplianceRequestId);
+                        $("#CertificateInfo_CCSIDBinaryToken").val(response.ccsidBinaryToken);
+                        $("#CertificateInfo_CCSIDSecret").val(response.ccsidSecret);
+                        $("#CertificateInfo_CCSIDComplianceRequestId").val(response.ccsidComplianceRequestId);
                         checkCcsidContainer();
                         hideLoading();
                         //alert('CCSID Generated Successfully!');
@@ -669,24 +678,25 @@
             $("#pcsidButton").on('click', function () {
                 showLoading();
                 var formData = new FormData($('#certInfoForm')[0]);
-
-                if (!formData.get('CCSIDBinaryToken') || !formData.get('CCSIDSecret')) {
+                var CCSIDBinaryToken = $("#CertificateInfo_CCSIDBinaryToken").val();
+                var CCSIDSecret = $("#CertificateInfo_CCSIDBinaryToken").val();
+                if (!CCSIDBinaryToken || !CCSIDSecret) {
                     hideLoading();
                     alert("Please provide all required inputs.");
                     return;
                 }
 
                 $.ajax({
-                    url: '@Url.Action("GetPCSID", "Wizard")',
+                    url: '@Url.Action("GetPCSID", "setup")',
                     type: 'POST',
                     processData: false,
                     contentType: false,
                     data: formData,
                     success: function (response) {
-                        $("#PCSIDBinaryToken").val(response.pcsidBinaryToken);
-                        $("#PCSIDSecret").val(response.pcsidSecret);
+                        $("#CertificateInfo_PCSIDBinaryToken").val(response.pcsidBinaryToken);
+                        $("#CertificateInfo_PCSIDSecret").val(response.pcsidSecret);
                         var formattedDate = response.registeredDate.slice(0, 16);
-                        $("#RegisteredDate").val(formattedDate);
+                        $("#CertificateInfo_RegisteredDate").val(formattedDate);
                         checkPcsidContainer();
                         hideLoading();
                         //alert('PCSID Generated Successfully!');
@@ -707,7 +717,7 @@
             }
 
             function checkCcsidContainer() {
-                var cCSIDBinaryToken = $("#CCSIDBinaryToken").val();
+                var cCSIDBinaryToken = $("#CertificateInfo_CCSIDBinaryToken").val();
                 $("#ccsidContainer").toggleClass("d-none", !!cCSIDBinaryToken);
                 $("#urlContainer").toggleClass("col-md-10", !cCSIDBinaryToken).toggleClass("col-md-12", !!cCSIDBinaryToken);
                 $("#pcsidContainer").toggleClass("d-none", !cCSIDBinaryToken);
@@ -715,7 +725,7 @@
             }
 
             function checkPcsidContainer() {
-                var pCSIDBinaryToken = $("#PCSIDBinaryToken").val();
+                var pCSIDBinaryToken = $("#CertificateInfo_PCSIDBinaryToken").val();
                 $("#pcsidContainer").toggleClass("d-none", !!pCSIDBinaryToken);
                 $("#pcsidButton").prop("disabled", !!(pCSIDBinaryToken));
                 $("#downloadCertificateButton").prop("hidden", !pCSIDBinaryToken);
@@ -736,6 +746,102 @@
             checkCcsidContainer();
             checkPcsidContainer();
         });
+
+    </script>
+
+
+    <script type="text/javascript">
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var isFileReady = '@Model.IsFileReady'.toLowerCase() === 'true';
+            var businessDetails = @Html.Raw(Json.Serialize(Model.BusinessDetailsJson));
+            var apiUrl = '@Model.Api' + '/business-details-form/38cf4712-6e95-4ce1-b53a-bff03edad273';
+            var secretKey = '@Model.Token';
+
+            var fileData = '@Html.Raw(Model.FileContent)'; 
+            var fileName = '@Model.Filename'; 
+
+            var message = "";
+            
+
+            if (isFileReady) {
+                var payload;
+                try {
+                    payload = JSON.parse(businessDetails);
+                    console.log('Parsed Payload:', payload);
+                } catch (error) {
+                    console.error("Error parsing businessDetails JSON:", error);
+                    message += `Error parsing businessDetails JSON: ${error.message}\n`;
+                    return;
+                }
+
+                if (payload) {
+                    fetch(apiUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${secretKey}`
+                        },
+                        body: payload
+                    })
+                        .then(response => {
+                            console.log('Network Response Status:', response.status);
+                            return response.text().then(text => ({
+                                status: response.status,
+                                ok: response.ok,
+                                body: text
+                            }));
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                console.log('Update Zatca Reference successful!');
+                                message += 'Update Zatca Reference: successful\n';
+                            } else {
+                                console.error('Error response body:', response.body);
+                                message += `Update Zatca Reference Error: Network response was not ok. ${response.body}\n`;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Update Zatca Reference Error:', error.message);
+                            message += `Update Zatca Reference Error: ${error.message}\n`;
+                        })
+                        .finally(() => {
+                            if (isFileReady) {
+                                if (fileData && fileName) {
+                                    downloadFile(fileData, fileName);
+                                } else {
+                                    console.error('File data or filename is missing.');
+                                    message += 'File data or filename is missing.\n';
+                                }
+                            }
+                            alert(message);
+                        });
+                } else {
+                    console.error("Payload is null or undefined");
+                }
+            }
+        });
+
+       function downloadFile(base64Data, fileName) {
+            var binaryString = atob(base64Data);
+            var binaryLen = binaryString.length;
+            var bytes = new Uint8Array(binaryLen);
+
+            for (var i = 0; i < binaryLen; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+
+            var blob = new Blob([bytes], { type: "application/zip" });
+
+            var link = document.createElement("a");
+            var url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = fileName;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
     </script>
 

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
-using ZatcaEGS.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +17,8 @@ if (portArg != null && int.TryParse(portArg, out int parsedPort))
 {
     if (parsedPort != 80 || parsedPort != 443 || parsedPort != 0)
     {
-        Console.WriteLine($"Using port: {parsedPort}");
+        //Console.WriteLine($"Using port: {parsedPort}");
+
         builder.WebHost.ConfigureKestrel(options =>
         {
             //options.Listen(System.Net.IPAddress.Any, parsedPort, listenOptions =>
@@ -39,7 +39,6 @@ if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 }
 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 {
-    // Use Systemd for Linux and macOS
     builder.Host.UseSystemd();
 }
 
@@ -59,6 +58,7 @@ builder.Services.AddCors(options =>
 // Add controllers with views
 builder.Services.AddControllersWithViews();
 
+
 var app = builder.Build();
 
 // Configure middleware
@@ -76,7 +76,7 @@ app.UseRouting();
 app.UseCors("AllowAllOrigins");
 
 // Use custom middleware
-app.UseMiddleware<DisclaimerMiddleware>();
+//app.UseMiddleware<DisclaimerMiddleware>();
 
 // Use request localization
 var defaultCulture = new CultureInfo("en-US");

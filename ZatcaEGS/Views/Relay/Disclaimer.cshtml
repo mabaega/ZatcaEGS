@@ -1,0 +1,36 @@
+﻿@model SetupViewModel
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+        <!-- Increased the max-width to 900px for a wider card -->
+        <div class="card shadow-lg p-4 mb-5 rounded" style="max-width: 900px; width: 100%;">
+
+            <!-- Welcome Message -->
+            <h2 class="text-center mb-4">Welcome to ZatcaEGS</h2>
+            <p>You have been redirected here because your business data for Manager IO integration with Zatca eInvoicing is not yet set up, or there are adjustments required for your business data.</p>
+            <p>Please follow the steps provided in the wizard to ensure the integration works correctly.</p>
+            <hr>
+
+            <!-- Disclaimer Content -->
+            <h3 class="text-center mb-4">Disclaimer</h3>
+            <p>Please ensure that you run the system in a testing environment before deploying it in a live (production) environment. Using this application in a production environment without prior testing is entirely at your own risk.</p>
+            <p>The developers of this application are not responsible for any loss, damage, or negative consequences resulting from its use. Please note that this server does not store any user data.</p>
+            <p>If you need technical support or have suggestions for improving the application, please feel free to contact us. We appreciate your feedback to help improve this application.</p>
+
+            <hr>
+
+            <div class="d-flex justify-content-between mt-4">
+
+                <a href="@Model.Referrer" class="btn btn-secondary btn-lg" style="width: 48%;">I Disagree</a>
+
+                <form action="/Setup/IntegrationSetup" method="post" style="margin: 0; width: 48%;">
+                    <input type="hidden" name="Referrer" value="@Model.Referrer" />
+                    <input type="hidden" name="BusinessDetails" value="@Model.BusinessDetails" />
+                    <input type="hidden" name="Api" value="@Model.Api" />
+                    <input type="hidden" name="Token" value="@Model.Token" />
+                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">I Agree</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

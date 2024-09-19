@@ -10,6 +10,10 @@ namespace ZatcaEGS.Models
         public string Key { get; set; }
         public string Data { get; set; }
         public string Callback { get; set; }
+        public string Api { get; set; }
+        public string Token { get; set; }
+
+        public string BusinessDetails { get; set; }
         public string InvoiceJson { get; set; }
         public ManagerInvoice ManagerInvoice { get; set; }
         public string CertInfoString { get; set; }
@@ -22,8 +26,7 @@ namespace ZatcaEGS.Models
         public string LastPIH { get; set; } = "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==";
 
         public string DateCreated { get; set; }
-        public string BaseCurrency { get; set; }
-        public string BusinessDetails { get; set; }
+        public bool HasTokenSecret { get; set; }
 
         public RelayData() { }
 
@@ -33,19 +36,18 @@ namespace ZatcaEGS.Models
             Key = formData.GetValueOrDefault("Key");
             Callback = formData.GetValueOrDefault("Callback");
             Data = formData.GetValueOrDefault("Data");
+            Api = formData.GetValueOrDefault("Api");
+            Token = formData.GetValueOrDefault("Token");
 
             string DataString = JsonParser.UpdateJsonGuidValue(Data, ManagerCustomField.ZatcaUUIDGuid);
 
-            var (BaseCurrency, BusinessDetails, dynamicParts) = JsonParser.ParseJson(DataString);
+            var (businessDetails, dynamicParts) = JsonParser.ParseJson(DataString);
 
-            var AccessToken = JsonParser.FindStringByGuid(BusinessDetails, ManagerCustomField.TokenInfoGuid);
+            BusinessDetails = businessDetails;
 
-            var icv = JsonParser.FindStringByGuid(BusinessDetails, ManagerCustomField.LastIcvGuid) ?? LastICV.ToString();
+            var certString = JsonParser.FindStringByGuid(businessDetails, ManagerCustomField.CertificateInfoGuid);
 
-            LastICV = int.TryParse(icv, out int icvNumber) ? icvNumber : 0;
-            LastPIH = JsonParser.FindStringByGuid(BusinessDetails, ManagerCustomField.TokenInfoGuid) ?? LastPIH;
-
-            var certString = JsonParser.FindStringByGuid(BusinessDetails, ManagerCustomField.CertificateInfoGuid);
+            HasTokenSecret = !string.IsNullOrEmpty(JsonParser.FindStringByGuid(businessDetails, ManagerCustomField.TokenInfoGuid));
 
             if (!string.IsNullOrEmpty(certString))
             {
@@ -53,9 +55,14 @@ namespace ZatcaEGS.Models
 
                 if (certificateInfo != null)
                 {
-                    certificateInfo.ApiSecret = AccessToken;
-                    certificateInfo.ApiEndpoint = UrlHelper.GetApiEndpoint(Referrer);
-                    EnvironmentType = certificateInfo.EnvironmentType;
+                    var icv = JsonParser.FindStringByGuid(businessDetails, ManagerCustomField.LastIcvGuid) ?? LastICV.ToString();
+
+                    LastICV = int.TryParse(icv, out int icvNumber) ? icvNumber : 0;
+                    LastPIH = JsonParser.FindStringByGuid(businessDetails, ManagerCustomField.LastPihGuid) ?? LastPIH;
+
+                    certificateInfo.ApiSecret = Token; //?? AccessToken;
+                    certificateInfo.ApiEndpoint = Api; // ?? UrlHelper.GetApiEndpoint(Referrer);
+                    certificateInfo.EnvironmentType = certificateInfo.EnvironmentType;
 
                     CertInfoString = ObjectCompressor.SerializeToBase64String(certificateInfo);
                 }

@@ -16,10 +16,6 @@ namespace ZatcaEGS.Models
         public string ReferrerLink { get; set; }
         public bool ShowSetupLink { get; set; }
     }
-    public class CertificateViewModel
-    {
-        public string ReferrerLink { get; set; }
-        public bool ShowSetupLink { get; set; }
-    }
+
 
 }

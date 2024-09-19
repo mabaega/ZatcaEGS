@@ -32,7 +32,7 @@ namespace ZatcaEGS.Models
         public string Referrer { get; set; } //Manager Data
         public string CallBack { get; set; } //Manager Data
         public string ServerResult { get; set; }
-        public string Base64SignedInvoice { get; set; }
+        public string Base64Invoice { get; set; }
         public string Base64QrCode { get; set; }
         public string XmlFileName { get; set; }
         public EnvironmentType EnvironmentType { get; set; } = EnvironmentType.NonProduction;

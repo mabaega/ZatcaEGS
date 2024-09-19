@@ -32,7 +32,7 @@
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title">Privacy <br /> and Data Security</h5><hr />
-                            <p class="card-text">We understand the importance of your data privacy and security. <b>ZatcaEGS does not store any data on our servers</b>. This service only converts invoices from the Manager application into eInvoice XML format, sends them to the ZATCA server, and returns the response from the ZATCA server back to your Manager application.</p>
+                            <p class="card-text">We understand the importance of your data privacy and security. <b>ZatcaEGS does not store any data on our servers</b>. This service converts invoices from the Manager application into eInvoiceXML, sends them to the ZATCA server, and returns the response from the ZATCA back to Manager application.</p>
                         </div>
                     </div>
                 </div>
@@ -47,108 +47,22 @@
             </div>
         </div>
 
-        <h4 class="mt-3">Free for "Manager" Application Users</h4>
+        <h4 class="mt-2">Free for "Manager" Application Users</h4>
         <p class="custom-lead">We are proud to offer ZatcaEGS as a free service to all users of the "Manager" accounting application. There are no hidden fees or subscriptions; this service is the result of our collaboration with the creators of "Manager" to provide the best solution for your business.</p>
 
-        <p class="mt-4">
-            <a id="getStarted" class="btn btn-lg btn-primary fw-bold" asp-area="" asp-controller="Wizard" asp-action="Index">Get Started Now!</a>
+        <h4 class="mt-3">How to Start?</h4>
+        <p class="custom-lead">
+            Add relay URL to Invoice to <span style="font-weight: bold;" id="relay-url"></span>, save Invoice and click [Relay].<br />
+            For the first time, it will be redirected to the business setup page to integrate Manager with Zatca. Follow the wizard, and you are ready.
         </p>
     </div>
 </div>
 
-@* <div>
-<button id="testButton">Test API</button>
-<pre id="response"></pre> <!-- To display the API response -->
-</div>
-
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('testButton').addEventListener('click', function () {
-            // URL and API Key
-            const url = 'http://127.0.0.1:55667/api2/folder-form/a1b2c3d4-e5f6-4abc-8def-abcdef000909';
-            const apiKey = 'CgVlVGVzdBISCZaStNzE7YJPEakeV7sJVk7TGhIJS/pLaayJAkQRrGYLBHbm8lg=';
-
-            // Payload for the API request
-            const payload = {
-                "Description": "ZatcaReference",
-                "CustomFields": {},
-                "CustomFields2": {
-                    "Strings": {
-                        "a1b2c3d4-e5f6-4abc-8def-abcdef000002": "10",
-                        "a1b2c3d4-e5f6-4abc-8def-abcdef000003": "UhoihB6jGYwRdVq6u/H3ga/qukbGO+g4zn5vRpoUBYA="
-                    },
-                    "Decimals": {},
-                    "Dates": {},
-                    "Booleans": {},
-                    "StringArrays": {}
-                },
-                "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000909"
-            };
-
-            // Perform the Fetch request
-            fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-KEY': apiKey
-                },
-                body: JSON.stringify(payload)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.text(); // Use response.text() for empty responses
-                    } else {
-                        throw new Error('Network response was not ok.');
-                    }
-                })
-                .then(text => {
-                    if (text.trim() === '') {
-                        document.getElementById('response').textContent = 'Request successful, no content returned.';
-                    } else {
-                        try {
-                            // Attempt to parse JSON if content is available
-                            const jsonResponse = JSON.parse(text);
-                            document.getElementById('response').textContent = JSON.stringify(jsonResponse, null, 2);
-                        } catch (e) {
-                            // Handle JSON parsing errors
-                            document.getElementById('response').textContent = `Response received but failed to parse as JSON: ${text}`;
-                        }
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('response').textContent = `Error: ${error.message}`;
-                });
-        });
-    });
-</script> *@
-
-@* 
-<div>
-<button id="testButton2">Test API2</button>
-
-<div id="response2"></div>
-</div>
-
 <script>
-    document.getElementById('testButton2').addEventListener('click', function () {
-        fetch('http://127.0.0.1:55667/api2/access-tokens', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'X-API-KEY': 'CgVlVGVzdBISCZaStNzE7YJPEakeV7sJVk7TGhIJS/pLaayJAkQRrGYLBHbm8lg='
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById('response2').innerText = JSON.stringify(data, null, 2);
-            })
-            .catch(error => {
-                document.getElementById('response2').innerText = 'Error: ' + error.message;
-            });
-    });
-</script> *@
+    let currentUrl = window.location.origin + window.location.pathname;
+    if (currentUrl.endsWith('/')) {
+        currentUrl = currentUrl.slice(0, -1);
+    }
+    const relayUrl = currentUrl + '/relay';
+    document.getElementById('relay-url').textContent = relayUrl;
+</script>

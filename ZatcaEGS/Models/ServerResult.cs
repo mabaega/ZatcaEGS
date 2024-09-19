@@ -2,18 +2,6 @@
 
 namespace ZatcaEGS.Models
 {
-    //public class ZatcaRequestApi
-    //{
-    //    [JsonProperty("uuid")]
-    //    public string uuid { get; set; }
-
-    //    [JsonProperty("invoiceHash")]
-    //    public string invoiceHash { get; set; }
-
-    //    [JsonProperty("invoice")]
-    //    public string invoice { get; set; }
-    //}
-
     public class ServerResult
     {
 

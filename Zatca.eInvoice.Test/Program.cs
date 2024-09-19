@@ -13,8 +13,8 @@ public class ZatcaService
     private const string ProductionCSIDUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/production/csids";
     private const string ComplianceCheckUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/compliance/invoices";
 
-    //private const string ReportingUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/reporting/single";
-    //private const string ClearanceUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single";
+    private const string ReportingUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/reporting/single";
+    private const string ClearanceUrl = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single";
 
     private readonly HttpClient _httpClient;
 
@@ -30,6 +30,7 @@ public class ZatcaService
         try
         {
             // Step 1: Create CSR
+
             var csrGenerationDto = new CsrGenerationDto
             {
                 CommonName = "TST-886431145-399999999900003",
@@ -48,6 +49,7 @@ public class ZatcaService
 
             onboardingResult.GeneratedCsr = generatedCsr;
             onboardingResult.PrivateKey = privateKey;
+
 
             // Step 2: Get CCSID
             const string otp = "12345";
@@ -70,6 +72,7 @@ public class ZatcaService
             onboardingResult.CCSIDBinaryToken = zatcaResult.BinarySecurityToken;
             onboardingResult.CCSIDComplianceRequestId = zatcaResult.RequestID;
             onboardingResult.CCSIDSecret = zatcaResult.Secret;
+
 
             // Step 3: Get PCSID
             jsonContent = JsonConvert.SerializeObject(new { compliance_request_id = zatcaResult.RequestID });
@@ -407,22 +410,13 @@ public class SignedInvoiceResult
     public ZatcaRequestApi RequestApi { get; set; }
 }
 
-//public class ZatcaRequestApi
-//{
-//    [JsonProperty("uuid")]
-//    public string Uuid { get; set; }
-
-//    [JsonProperty("invoiceHash")]
-//    public string InvoiceHash { get; set; }
-
-//    [JsonProperty("invoice")]
-//    public string Invoice { get; set; }
-//}
-
 public class ServerResult
 {
     [JsonProperty("requestType")]
     public string RequestType { get; set; }
+    
+    [JsonProperty("requestUrl")]
+    public string RequestUrl { get; set; }
 
     [JsonProperty("statusCode")]
     public string StatusCode { get; set; }
@@ -536,53 +530,53 @@ class Program
             {
                 //Step 1: Onboarding
 
-                var result = await zatcaService.OnboardingDevice();
+                //var result = await zatcaService.OnboardingDevice();
 
-                Console.WriteLine("Onboarding Result: \n\n");
-                Console.WriteLine($"Generated CSR:\n{result.GeneratedCsr} \n");
-                Console.WriteLine($"Private Key:\n{result.PrivateKey} \n");
-                Console.WriteLine($"CCSID Compliance Request ID:\n{result.CCSIDComplianceRequestId} \n");
-                Console.WriteLine($"CCSID Binary Token:\n{result.CCSIDBinaryToken}  \n");
-                Console.WriteLine($"CCSID Secret:\n{result.CCSIDSecret} \n");
-                Console.WriteLine($"PCSID Binary Token:\n{result.PCSIDBinaryToken} \n");
-                Console.WriteLine($"PCSID Secret:\n{result.PCSIDSecret}  \n\n");
+                //Console.WriteLine("Onboarding Result: \n\n");
+                //Console.WriteLine($"Generated CSR:\n{result.GeneratedCsr} \n");
+                //Console.WriteLine($"Private Key:\n{result.PrivateKey} \n");
+                //Console.WriteLine($"CCSID Compliance Request ID:\n{result.CCSIDComplianceRequestId} \n");
+                //Console.WriteLine($"CCSID Binary Token:\n{result.CCSIDBinaryToken}  \n");
+                //Console.WriteLine($"CCSID Secret:\n{result.CCSIDSecret} \n");
+                //Console.WriteLine($"PCSID Binary Token:\n{result.PCSIDBinaryToken} \n");
+                //Console.WriteLine($"PCSID Secret:\n{result.PCSIDSecret}  \n\n");
 
-                // Step 2: Create Signed Invoice
-                //var signedInvoiceResult = await zatcaService.CreateInvoiceXml(result.PCSIDBinaryToken, result.PrivateKey);
-                SignedInvoiceResult signedInvoiceResult = await zatcaService.GenerateSignedInvoice(result.CCSIDBinaryToken, result.PrivateKey);
+                //// Step 2: Create Signed Invoice
+                ////var signedInvoiceResult = await zatcaService.CreateInvoiceXml(result.PCSIDBinaryToken, result.PrivateKey);
+                //SignedInvoiceResult signedInvoiceResult = await zatcaService.GenerateSignedInvoice(result.CCSIDBinaryToken, result.PrivateKey);
 
-                Console.WriteLine("Signed Invoice Result:\n\n");
-                //Console.WriteLine($"Base64 Signed Invoice:\n{signedInvoiceResult.Base64SignedInvoice} \n");
-                Console.WriteLine($"Base64 QR Code:\n{signedInvoiceResult.Base64QrCode} \n");
-                Console.WriteLine($"XML File Name:\n{signedInvoiceResult.XmlFileName} \n");
-                //Console.WriteLine($"Request API:\n{signedInvoiceResult.RequestApi} \n");
+                //Console.WriteLine("Signed Invoice Result:\n\n");
+                ////Console.WriteLine($"Base64 Signed Invoice:\n{signedInvoiceResult.Base64SignedInvoice} \n");
+                //Console.WriteLine($"Base64 QR Code:\n{signedInvoiceResult.Base64QrCode} \n");
+                //Console.WriteLine($"XML File Name:\n{signedInvoiceResult.XmlFileName} \n");
+                ////Console.WriteLine($"Request API:\n{signedInvoiceResult.RequestApi} \n");
 
 
-                // Step 3: Compliance Check
-                var complianceResult = await zatcaService.ComplianceCheck(
-                    result.CCSIDBinaryToken,
-                    result.CCSIDSecret,
-                    signedInvoiceResult.RequestApi
-                );
+                //// Step 3: Compliance Check
+                //var complianceResult = await zatcaService.ComplianceCheck(
+                //    result.CCSIDBinaryToken,
+                //    result.CCSIDSecret,
+                //    signedInvoiceResult.RequestApi
+                //);
 
-                // Convert the result to JSON, removing null values
-                var settings = new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    Formatting = Formatting.Indented
-                };
-                var jsonResult = JsonConvert.SerializeObject(complianceResult, settings);
+                //// Convert the result to JSON, removing null values
+                //var settings = new JsonSerializerSettings
+                //{
+                //    NullValueHandling = NullValueHandling.Ignore,
+                //    Formatting = Formatting.Indented
+                //};
+                //var jsonResult = JsonConvert.SerializeObject(complianceResult, settings);
 
-                // Display the formatted JSON result
-                Console.WriteLine("\nCompliance Check Result (JSON):");
-                Console.WriteLine(jsonResult);
+                //// Display the formatted JSON result
+                //Console.WriteLine("\nCompliance Check Result (JSON):");
+                //Console.WriteLine(jsonResult);
 
 
                 //// Decode Base64QrCode
 
                 //Console.WriteLine("\nDecoding Generated QRCode:");
                 //Console.WriteLine();
-                string qrCodeContent = signedInvoiceResult.Base64QrCode; // "AR1NYXhpbXVtIFNwZWVkIFRlY2ggU3VwcGx5IExURAIPMzk5OTk5OTk5OTAwMDAzAxMyMDI0LTA4LTIzVDAwOjAwOjAwBAcxNjU2LjAwBQYyMTYuMDAGLGV2QkZwOEI5TmpLVElVQi9JSTJqNXpRei9xVm5uV2drTFQzRkZYYTBacDg9B2BNRVVDSUVRN3dTKzF0WmRNbDQ4YWVQUWF4MDNKQlFqWENrbVpHNnNpb2FWRU9hZkFBaUVBMVE5bXpxZlZPMi9oRUhmR3lBVEpldzdSNnpOUDJGUm1TbFJQajNRT3FQUT0IWDBWMBAGByqGSM49AgEGBSuBBAAKA0IABKFgimtEmvRSBK0zr9LgJAtVSCl8VPZz6cdr5X+MoTHo8vHNNlyW5Q6u7T8naPJqtGoTjJjaPIMJ4u17dSk/VHgJRzBFAiEAsT+JyGadZcJQpRtxrfJyLyirBou8V0dWNCu94j26oBsCID2ELgzyOAwEAM9LOZ3a6I8kDqApHcsTTdTvl6psL+tc"; //signedInvoiceResult.Base64QrCode;
+                string qrCodeContent = "AW/YtNix2YPYqSDYqtmI2LHZitivINin2YTYqtmD2YbZiNmE2YjYrNmK2Kcg2KjYo9mC2LXZiSDYs9ix2LnYqSDYp9mE2YXYrdiv2YjYr9ipIHwgTWF4aW11bSBTcGVlZCBUZWNoIFN1cHBseSBMVEQCDzMxMTI0MTc1NjEwMDAwMwMABAQ0LjYwBQMwLjYGLCtyUmVaN2NCdDBQZkswSFJDbnVSUnFmSjZSVkVDcXVmenJ3MnJFajJ2cE09B2BNRVVDSUdxTUpEa25HbTVEZURYRGJwZFBPTndreTJGVEl0OGRRaTYyMWcyNndFc0VBaUVBaDU0WHFXK3BIdWVmRXpaQlF6R2xOeE1sOE56Lzk3MVdKNkFRUElTaHNJOD0IWDBWMBAGByqGSM49AgEGBSuBBAAKA0IABNgR76Z9/5pVMvxS2I93dpl7zNt2IiKPw2FzTkLybXPNoIyHlvbZmHlrdxdKtpdd0HqVgyEmGxxnnnflY/wIiHYJRjBEAiAddwmEpulhcWuGz3HsLtQCTF+tzhDZi2yb7ZQ5QvDtRQIgal7XjzSEnui95CkaM1iuApKQYqzXex1YWFinwm8OjyY="; //signedInvoiceResult.Base64QrCode;
                 var decodedContent = QrCodeDecoder.DecodeQRCode(qrCodeContent);
                 QrCodeDecoder.PrintDecodedContent(decodedContent);
 

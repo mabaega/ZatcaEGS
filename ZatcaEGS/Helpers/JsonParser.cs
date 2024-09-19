@@ -6,12 +6,12 @@ namespace ZatcaEGS.Helpers
     {
         public JsonParser() { }
 
-        public static (string BaseCurrency, string BusinessDetails, Dictionary<string, string> DynamicParts) ParseJson(string jsonString)
+        public static (string BusinessDetails, Dictionary<string, string> DynamicParts) ParseJson(string jsonString)
         {
             JObject jsonObject = JObject.Parse(jsonString);
 
             // Parse BaseCurrency
-            string baseCurrency = jsonObject["BaseCurrency"]?.ToString() ?? "{}";
+            // string baseCurrency = jsonObject["BaseCurrency"]?.ToString() ?? "{}";
 
             // Parse BusinessDetails
             string businessDetails = jsonObject["BusinessDetails"]?.ToString() ?? "{}";
@@ -27,7 +27,7 @@ namespace ZatcaEGS.Helpers
                 }
             }
 
-            return (baseCurrency, businessDetails, dynamicParts);
+            return (businessDetails, dynamicParts);
         }
 
         private static void ParseDynamicPart(JToken token, Dictionary<string, string> result)
@@ -171,20 +171,6 @@ namespace ZatcaEGS.Helpers
             return null; // Return null if the key is not found.
         }
 
-        ////find value by key inside section
-        //public static string FindStringValueByKey(JToken token, string rootKey, string key)
-        //{
-        //    if (token == null || string.IsNullOrEmpty(rootKey) || string.IsNullOrEmpty(key))
-        //        return null;
-
-        //    // Find the rootKey first
-        //    var rootToken = token.SelectToken(rootKey);
-        //    if (rootToken == null)
-        //        return null;
-
-        //    // Now search for the key within the rootKey
-        //    return FindValueByKey(rootToken, key);
-        //}
 
         public static string FindValueByKey(JToken token, string key)
         {
@@ -217,45 +203,61 @@ namespace ZatcaEGS.Helpers
         }
 
 
-        //Modify Data from Relay 
+        // Modify Data from Relay
         public static string ModifyStringInEditData(string editData, string key, string fieldGuid, string newValue)
         {
             JObject jsonObject = JObject.Parse(editData);
-            var targetSection = FindSectionContainingKey(jsonObject, key);
+            JObject targetSection;
+
+            // Determine the target section based on the key
+            if (string.IsNullOrEmpty(key))
+            {
+                targetSection = jsonObject; // If key is null or empty, work directly with the root object
+            }
+            else
+            {
+                targetSection = FindSectionContainingKey(jsonObject, key);
+            }
 
             if (targetSection == null)
             {
                 throw new InvalidOperationException("The section with the specified key was not found.");
             }
 
-            if (targetSection[key] is not JObject specificSection)
-            {
-                throw new InvalidOperationException($"The key '{key}' is missing or is not an object.");
-            }
+            // If the key is not null or empty, verify that it's a JObject
+            JObject specificSection;
 
-            var customFields2 = specificSection["CustomFields2"] as JObject;
-
-            if (customFields2?["Strings"]?[fieldGuid] != null)
+            if (!string.IsNullOrEmpty(key))
             {
-                customFields2["Strings"][fieldGuid] = newValue;
+                if (targetSection[key] is not JObject section)
+                {
+                    throw new InvalidOperationException($"The key '{key}' is missing or is not an object.");
+                }
+                specificSection = section;
             }
             else
             {
-                if (customFields2 == null)
-                {
-                    customFields2 = new JObject();
-                    specificSection["CustomFields2"] = customFields2;
-                }
-
-                var strings = customFields2["Strings"] as JObject;
-                if (strings == null)
-                {
-                    strings = new JObject();
-                    customFields2["Strings"] = strings;
-                }
-
-                strings[fieldGuid] = newValue;
+                // If key is null or empty, use the targetSection directly
+                specificSection = targetSection;
             }
+
+            // Ensure CustomFields2 and Strings are properly initialized
+            var customFields2 = specificSection["CustomFields2"] as JObject;
+            if (customFields2 == null)
+            {
+                customFields2 = new JObject();
+                specificSection["CustomFields2"] = customFields2;
+            }
+
+            var strings = customFields2["Strings"] as JObject;
+            if (strings == null)
+            {
+                strings = new JObject();
+                customFields2["Strings"] = strings;
+            }
+
+            // Set or update the field value
+            strings[fieldGuid] = newValue;
 
             return jsonObject.ToString();
         }
@@ -268,7 +270,7 @@ namespace ZatcaEGS.Helpers
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current.Property(key) != null)
+                if (string.IsNullOrEmpty(key) || current.Property(key) != null)
                 {
                     return current;
                 }
@@ -283,5 +285,42 @@ namespace ZatcaEGS.Helpers
             return null;
         }
 
+
+        public static string RemoveJsonField(string jsonString, string fieldToRemove)
+        {
+            // Parse the JSON string into a JObject
+            var jObject = JObject.Parse(jsonString);
+
+            // Recursively remove the field
+            RemoveField(jObject, fieldToRemove);
+
+            // Convert the modified JObject back to a JSON string
+            return jObject.ToString();
+        }
+
+        private static void RemoveField(JObject jObject, string fieldToRemove)
+        {
+            // Check if the JObject contains the field to remove
+            if (jObject.ContainsKey(fieldToRemove))
+            {
+                jObject.Remove(fieldToRemove);
+            }
+
+            // Recursively check all nested objects
+            foreach (var property in jObject.Properties().ToList())
+            {
+                if (property.Value.Type == JTokenType.Object)
+                {
+                    RemoveField((JObject)property.Value, fieldToRemove);
+                }
+                else if (property.Value.Type == JTokenType.Array)
+                {
+                    foreach (var item in property.Value.Children<JObject>())
+                    {
+                        RemoveField(item, fieldToRemove);
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.IO.Compression;
 using System.Net.Http.Headers;
-using System.Net.Mime;
 using System.Text;
 using Zatca.eInvoice;
 using Zatca.eInvoice.Helpers;
@@ -13,25 +11,38 @@ using ZatcaEGS.Models;
 
 namespace ZatcaEGS.Controllers
 {
-    public class WizardController : Controller
+    public class SetupController : Controller
     {
         private readonly CsrGenerator _csrGenerator;
         private readonly HttpClient _httpClient = new();
 
-        public WizardController()
+        public SetupController()
         {
             _csrGenerator = new CsrGenerator();
         }
 
-        public IActionResult Index()
+        [HttpGet("Setup/UpdateBusinessData")]
+        public IActionResult UpdateBusinessData()
         {
-            var currentUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}{Request.QueryString}";
-
-            var existingModel = new CertificateInfo()
+            var svmJson = TempData["SetupViewModel"] as string;
+            if (string.IsNullOrEmpty(svmJson))
             {
-                ApiEndpoint = "http://127.0.0.1:55667/api2",
-                ApiSecret = "",
+                // Handle the case where no TempData is found
+                return Content("No TempData found."); // For debugging purposes
+            }
 
+            var viewModel = JsonConvert.DeserializeObject<SetupViewModel>(svmJson);
+            return View(viewModel); // This will render Views/Setup/UpdateBusinessData.cshtml
+        }
+
+
+        [HttpPost("Setup/IntegrationSetup")]
+        public IActionResult IntegrationSetup([FromForm] SetupViewModel viewModel)
+        {
+            var model = new CertificateInfo
+            {
+                ApiEndpoint = viewModel.Api,
+                ApiSecret = viewModel.Token,
                 IdentificationID = "1010010000",
                 IdentificationScheme = "CRN",
                 StreetName = "Prince Sultan",
@@ -45,20 +56,37 @@ namespace ZatcaEGS.Controllers
                 RegistrationName = "Maximum Speed Tech Supply LTD",
                 BusinessCategory = "Supply activities",
                 EnvironmentType = EnvironmentType.NonProduction,
-                RelayURL = UrlHelper.RelayUrl(currentUrl)
+                RelayURL = UrlHelper.GetRelayUrl(viewModel.Referrer)
             };
 
-            return View(existingModel);
+            viewModel.CertificateInfo = model;
+
+            return View(viewModel);
         }
 
 
-        [HttpPost]
-        public IActionResult Finish(CertificateInfo model)
+        [HttpPost("Setup/finish")]
+        public IActionResult Finish(SetupViewModel viewModel)
         {
-            TempData.Clear();
-
+            CertificateInfo model = viewModel.CertificateInfo;
             if (ModelState.IsValid && !string.IsNullOrEmpty(model.PCSIDBinaryToken))
             {
+                model.ApiSecret = null;
+                var cert = ObjectCompressor.SerializeToBase64String(model);
+
+                // Update businessDetails
+                var businessDetails = viewModel.BusinessDetails;
+                businessDetails = JsonParser.ModifyStringInEditData(businessDetails, "", ManagerCustomField.CertificateInfoGuid, cert);
+                businessDetails = JsonParser.ModifyStringInEditData(businessDetails, "", ManagerCustomField.LastIcvGuid, "0");
+                businessDetails = JsonParser.ModifyStringInEditData(businessDetails, "", ManagerCustomField.LastPihGuid, "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==");
+                viewModel.BusinessDetails = businessDetails;
+
+                // Serialize BusinessDetails for JavaScript
+                viewModel.BusinessDetailsJson = JsonConvert.SerializeObject(businessDetails);
+
+                model.ApiSecret = viewModel.Token;
+                // Console.WriteLine(viewModel.BusinessDetails);
+
                 using (var memoryStream = new MemoryStream())
                 {
                     using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
@@ -84,7 +112,7 @@ namespace ZatcaEGS.Controllers
                         using (var writer = new StreamWriter(infoEntry.Open()))
                         {
                             writer.WriteLine("Manager Certificate Info:");
-                            writer.WriteLine(ObjectCompressor.SerializeToBase64String(model));
+                            writer.WriteLine(cert);
                             writer.WriteLine("\nOnboarding Device Info:");
                             foreach (var property in model.GetType().GetProperties())
                             {
@@ -98,19 +126,18 @@ namespace ZatcaEGS.Controllers
                         }
                     }
 
-                    TempData["Certificate"] = ObjectCompressor.SerializeToBase64String(model);
-                    TempData["LastICV"] = "0";
-                    TempData["LastPIH"] = "";
-
-                    return File(memoryStream.ToArray(), MediaTypeNames.Application.Zip, $"{model.CsrCommonName}_{model.EnvironmentType}.zip");
-
+                    memoryStream.Position = 0;
+                    var fileContent = memoryStream.ToArray();
+                    viewModel.FileContent = Convert.ToBase64String(fileContent); // Convert file content to Base64
+                    viewModel.Filename = $"{model.CsrCommonName}_{model.EnvironmentType}.zip";
+                    viewModel.IsFileReady = true;
                 }
             }
-            return View("Index", model);
+            return View("IntegrationSetup", viewModel);
         }
 
 
-        [HttpGet("GetCfData")]
+        [HttpGet("setup/GetCfData")]
         public string CustomFieldJson()
         {
             byte[] jsonDataBytes = ZatcaEGS.Properties.Resources.cfData;
@@ -118,95 +145,7 @@ namespace ZatcaEGS.Controllers
             return jsonData;
         }
 
-        [HttpPost("generatecf")]
-        public async Task<IActionResult> GenerateCustomFieldAsync([FromBody] AccessTokenDto token)
-        {
-            try
-            {
-                string ApiUrl = token.ApiEndpoint;
-                string apiKey = token.ApiSecret;
-
-                // Load JSON data from resources
-                byte[] jsonDataBytes = ZatcaEGS.Properties.Resources.cfData;
-                string jsonData = Encoding.UTF8.GetString(jsonDataBytes);
-
-                try
-                {
-                    JObject jsonObject = JObject.Parse(jsonData);
-                    JArray jsonDataArray = (JArray)jsonObject["jsondata"];
-
-                    StringBuilder result = new StringBuilder();
-
-                    foreach (JObject item in jsonDataArray.Cast<JObject>())
-                    {
-                        string apiPath = item.Value<string>("apipath");
-
-                        if (item.ContainsKey("data"))
-                        {
-                            JObject dataObject = (JObject)item["data"];
-                            string jsonPayload = dataObject.ToString(Newtonsoft.Json.Formatting.None);
-
-                            string key = dataObject.Value<string>("Key");
-
-                            string fullPath = $"{ApiUrl}{apiPath}/{key}";
-
-                            string nameValue = dataObject.Value<string>("Name");
-                            if (nameValue == null)
-                            {
-                                nameValue = dataObject.Value<string>("Description");
-                            }
-
-                            var responseMessage = await SendDataToApi(fullPath, jsonPayload, apiKey);
-
-                            result.AppendLine(nameValue + " " + responseMessage);
-
-                            await Task.Delay(10); // Use Task.Delay for async delay
-                        }
-                    }
-                    return Ok(result.ToString());
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest("Error generating Custom Field: " + ex.Message);
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("Error generating Custom Field: " + ex.Message);
-            }
-        }
-
-        internal static async Task<string> SendDataToApi(string fullPath, string jsonPayload, string apiKey)
-        {
-            try
-            {
-                using (var httpClient = new HttpClient())
-                {
-
-                    httpClient.DefaultRequestHeaders.Add("X-API-KEY", apiKey);
-                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-
-                    // Send PUT request to the full URL
-                    var response = await httpClient.PutAsync(fullPath, content);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return $"Successfully generated!";
-                    }
-                    else
-                    {
-                        return $"Failed with Status code: {response.StatusCode}";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return $"Error: {ex.Message}";
-            }
-        }
-
-
-        [HttpPost("generatecsr")]
+        [HttpPost("setup/generatecsr")]
         public IActionResult GenerateCSR([FromBody] CsrGenerationDto csrData, [FromQuery] EnvironmentType environmentType)
         {
             if (csrData.IsValid(out var errors))
@@ -222,6 +161,7 @@ namespace ZatcaEGS.Controllers
 
                     var (csr, privateKey, errorMessages) = _csrGenerator.GenerateCsrAndPrivateKey(csrData, environmentType, false);
                     return Ok(new { Csr = csr, PrivateKey = privateKey, ErrorMessages = errorMessages });
+
                 }
                 catch (Exception ex)
                 {
@@ -236,11 +176,13 @@ namespace ZatcaEGS.Controllers
             }
         }
 
-        [HttpPost("getccsid")]
-        public async Task<IActionResult> GetCCSID([FromForm] CertificateInfo model, [FromForm] string OTP)
+        [HttpPost("setup/getccsid")]
+        public async Task<IActionResult> GetCCSID([FromForm] SetupViewModel viewModel, [FromForm] string OTP)
         {
             try
             {
+                CertificateInfo model = viewModel.CertificateInfo;
+
                 // Get CCSID
                 string jsonContent = JsonConvert.SerializeObject(new { csr = model.GeneratedCSR });
 
@@ -268,10 +210,6 @@ namespace ZatcaEGS.Controllers
                     CCSIDSecret = zatcaResult.Secret
                 };
 
-                model.CCSIDBinaryToken = ccsidResult.CCSIDBinaryToken;
-                model.CCSIDComplianceRequestId = ccsidResult.CCSIDComplianceRequestId;
-                model.CCSIDSecret = ccsidResult.CCSIDSecret;
-
                 return Ok(ccsidResult);
             }
             catch
@@ -280,11 +218,12 @@ namespace ZatcaEGS.Controllers
             }
         }
 
-        [HttpPost("getpcsid")]
-        public async Task<IActionResult> GetPCSID([FromForm] CertificateInfo model)
+        [HttpPost("setup/getpcsid")]
+        public async Task<IActionResult> GetPCSID([FromForm] SetupViewModel viewModel)
         {
             try
             {
+                CertificateInfo model = viewModel.CertificateInfo;
 
                 //Invoice Compliance Check
                 ComplianceCheckHelper ct = new ComplianceCheckHelper(model, model.CCSIDBinaryToken, model.EcSecp256k1Privkeypem);
@@ -376,16 +315,13 @@ namespace ZatcaEGS.Controllers
                 string resultContent = await response.Content.ReadAsStringAsync();
                 ZatcaResultDto zatcaResult = JsonConvert.DeserializeObject<ZatcaResultDto>(resultContent);
 
+
                 var pcsidResult = new PCSIDResultDto
                 {
                     PCSIDBinaryToken = zatcaResult.BinarySecurityToken,
                     PCSIDSecret = zatcaResult.Secret,
                     RegisteredDate = DateTime.Now,
                 };
-
-                model.PCSIDBinaryToken = pcsidResult.PCSIDBinaryToken;
-                model.PCSIDSecret = pcsidResult.PCSIDSecret;
-                model.RegisteredDate = pcsidResult.RegisteredDate;
 
                 return Ok(pcsidResult);
             }

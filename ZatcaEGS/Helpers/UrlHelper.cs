@@ -32,7 +32,7 @@
             throw new ArgumentException("Invalid referrer URL");
         }
 
-        public static string RelayUrl(string referrer)
+        public static string GetRelayUrl(string referrer)
         {
             var uri = new Uri(referrer);
             var baseUrl = $"{uri.Scheme}://{uri.Host}";
@@ -44,21 +44,5 @@
 
             return $"{baseUrl}/relay";
         }
-
-        public static string GetApiEndpoint(string referrer)
-        {
-            var uri = new Uri(referrer);
-            var baseUrl = $"{uri.Scheme}://{uri.Host}";
-
-            if (uri.Port != 80 && uri.Port != 443)
-            {
-                baseUrl += $":{uri.Port}";
-            }
-
-            baseUrl += "/api2";
-
-            return baseUrl;
-        }
-
     }
 }

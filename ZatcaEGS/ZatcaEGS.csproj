@@ -9,17 +9,33 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>24.09.13.0001</AssemblyVersion>
-    <FileVersion>24.09.13.0001</FileVersion>
+    <AssemblyVersion>24.09.19.0001</AssemblyVersion>
+    <FileVersion>24.09.19.0001</FileVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Views\Disclaimer\**" />
+    <Compile Remove="Views\Wizard\**" />
+    <Content Remove="Views\Disclaimer\**" />
+    <Content Remove="Views\Wizard\**" />
+    <EmbeddedResource Remove="Views\Disclaimer\**" />
+    <EmbeddedResource Remove="Views\Wizard\**" />
+    <None Remove="Views\Disclaimer\**" />
+    <None Remove="Views\Wizard\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Controllers\DisclaimerController.cs" />
+    <Compile Remove="Controllers\WizardController.cs" />
     <Compile Remove="Helpers\ZatcaReference.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="cfData - Copy.json" />
+    <Content Remove="Views\Relay\Certificate.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cfData.json" />
+    <None Remove="ScriptReference.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="cfData.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0" />

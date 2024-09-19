@@ -22,14 +22,6 @@
             </div>
         </div>
 
-        @* Pastikan ErrorMessage memang ingin digunakan, atau mungkin Anda ingin menampilkan QR code dari properti lain *@
-        @*
-        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-        {
-        <p class="lead">@Html.Raw(Model.ErrorMessage)</p>
-        }
-        *@
-
         @if (Model.ShowSetupLink)
         {
             <p>

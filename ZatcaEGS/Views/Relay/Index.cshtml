@@ -209,7 +209,7 @@
                                 <input type="hidden" name="ServerResult" value="@Model.ServerResult" />
                                 <input type="hidden" name="XmlFileName" value="@Model.XmlFileName" />
                                 <input type="hidden" name="Base64QrCode" value="@Model.Base64QrCode" />
-                                <input type="hidden" name="Base64SignedInvoice" value="@Model.Base64SignedInvoice" />
+                                <input type="hidden" name="Base64Invoice" value="@Model.Base64Invoice" />
                                 <input type="hidden" name="InvoiceHash" value="@Model.InvoiceHash" />
                                 <input type="hidden" name="Timestamp" value="@Model.Timestamp" />
                                 <input type="hidden" name="EditData" value="@Model.EditData" />
@@ -264,11 +264,11 @@
                                         <div class="mb-2">
                                             <textarea class="form-control form-control-sm" id="textareaUbl" name="Base64SignedInvoice" rows="10" readonly wrap="off" style="margin-top: 10px; min-height: 200px;">
                                                 @{
-                                                    if (Model.Base64SignedInvoice != null)
+                                                    if (Model.Base64Invoice != null)
                                                     {
                                                         try
                                                         {
-                                                            var ublInvoice = Encoding.UTF8.GetString(Convert.FromBase64String(Model.Base64SignedInvoice));
+                                                            var ublInvoice = Encoding.UTF8.GetString(Convert.FromBase64String(Model.Base64Invoice));
                                                             var formattedXml = DocumentFormatter.Beautify(XDocument.Parse(ublInvoice));
                                                             @Html.Raw(formattedXml)
                                                             ;
@@ -325,43 +325,20 @@
                                         <button type="button" class="btn btn-secondary mt-1" onclick="window.location.href='@Model.Referrer'">Back to Manager</button>
                                     </div>
 
-                                    <div>
+                                    <div id="buttonsContainer">
+
                                         @if (!(Model.ApprovalStatus == "CLEARED" || Model.ApprovalStatus == "REPORTED"))
                                         {
-                                            <button type="submit" formaction="@Url.Action("ComplianceCheck")" class="btn btn-info mt-1">
+                                            <button id="complianceCheckBtn" class="btn btn-info mt-1">
                                                 <i class="fas fa-spinner fa-spin hidden"></i>
                                                 Compliance Check
                                             </button>
                                         }
-                                        else if ((Model.ApprovalStatus == "CLEARED" || Model.ApprovalStatus == "REPORTED") && Model.RequestType == "Invoice Compliant Check")
-                                        {
-                                            @if (!Model.InvoiceSubType.StartsWith("01"))
-                                            {
-                                                <button type="submit" formaction="@Url.Action("Reporting")" class="btn btn-primary mt-1">
-                                                    <i class="fas fa-spinner fa-spin hidden"></i>
-                                                    Invoice Reporting
-                                                </button>
-                                            }
-                                            @if (!Model.InvoiceSubType.StartsWith("02"))
-                                            {
-                                                <button type="submit" formaction="@Url.Action("Clearance")" class="btn btn-primary mt-1">
-                                                    <i class="fas fa-spinner fa-spin hidden"></i>
-                                                    Invoice Clearance
-                                                </button>
-                                            }
-                                        }
+                                        
+                                        <!-- Dynamic Button Here -->
+
                                     </div>
                                 </div>
-
-                                <script>
-                                    $(document).ready(function () {
-                                        $('button[type="submit"]').click(function () {
-                                            $(this).find('.fa-spinner').removeClass('hidden');
-                                        });
-                                    });
-                                </script>
-
-
 
                             </div>
                         </div>
@@ -380,7 +357,7 @@
                                 </div>
 
                                 <a id="downloadLink1" style="width: 200px"
-                                   href="data:application/xml;base64,@Model.Base64SignedInvoice"
+                                   href="data:application/xml;base64,@Model.Base64Invoice"
                                    class="btn btn-success mt-1" download="@Model.XmlFileName">Download eInvoice XML</a>
 
                                 <hr />
@@ -403,8 +380,76 @@
         </div>
     </footer>
 
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script>
+
+        $(document).ready(function () {
+
+            $('#complianceCheckBtn').click(function (e) {
+                e.preventDefault();
+                var $btn = $(this);
+                $btn.find('.fa-spinner').removeClass('hidden');
+
+                var formData = $('form').serialize();  // Serialize the entire form
+
+                $.ajax({
+                    url: '@Url.Action("AjaxComplianceCheck")',
+                    method: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        var jsonResponse = JSON.parse(response.serverResult);
+
+                        // Format the JSON response and display it in the textarea
+                        var formattedJson = JSON.stringify(jsonResponse, null, 4);  // Pretty-print JSON with 4 spaces
+                        $('#textareaResponse').val(formattedJson);
+
+                        // Hide compliance check button
+                        $btn.hide();
+
+                        // Create buttons dynamically based on the response
+                        var clearanceStatus = jsonResponse.clearanceStatus;
+                        var reportingStatus = jsonResponse.reportingStatus;
+                        var invoiceSubType = response.invoiceSubType;
+
+                        // Show Reporting and Clearance buttons based on response
+                        if (clearanceStatus === "CLEARED" || reportingStatus === "REPORTED") {
+                            if (!invoiceSubType.startsWith("01")) {
+                                $('#buttonsContainer').append(
+                                    `<button id="reportingBtn" type="submit" formaction="@Url.Action("Reporting")" class="btn btn-primary mt-1">
+                                        <i class="fas fa-spinner fa-spin hidden"></i>
+                                        Invoice Reporting
+                                    </button>`
+                                );
+                            }
+                            if (!invoiceSubType.startsWith("02")) {
+                                $('#buttonsContainer').append(
+                                    `<button id="clearanceBtn" type="submit" formaction="@Url.Action("Clearance")" class="btn btn-primary mt-1">
+                                        <i class="fas fa-spinner fa-spin hidden"></i>
+                                        Invoice Clearance
+                                    </button>`
+                                );
+                            }
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $('#textareaResponse').val('Error: ' + xhr.responseText);
+                    },
+                    complete: function () {
+                        $btn.find('.fa-spinner').addClass('hidden');
+                    }
+                });
+            });
+
+            $(document).on('click', '#reportingBtn, #clearanceBtn', function () {
+                var $btn = $(this);
+                $btn.find('.fa-spinner').removeClass('hidden');
+            });
+
+        });
+
+    </script>
 
     <script type="text/javascript">
 
@@ -453,7 +498,7 @@
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-API-KEY': secretKey
+                        'Authorization': `Bearer ${secretKey}`
                     },
                     body: JSON.stringify(payload)
                 }).then(response => {
@@ -472,7 +517,7 @@
                                 method: 'PUT',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'X-API-KEY': secretKey
+                                    'Authorization': `Bearer ${secretKey}`
                                 },
                                 body: JSON.stringify(payload)
                             }).then(response => {
@@ -517,12 +562,13 @@
                 const sfileName = '@fileName';
 
                 if (sfileContent) {
-                    downloadFile(message + sfileContent, sfileName);
+                    //downloadFile(message + sfileContent, sfileName);
+                    downloadFile(sfileContent, sfileName);
                 }
             }
         });
 
-    </script>
+    </script> 
 
 </body>
 </html>

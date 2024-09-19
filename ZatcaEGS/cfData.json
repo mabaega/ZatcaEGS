@@ -8,9 +8,7 @@
         "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000000",
         "Name": "Access Token Secret",
         "OptionsForDropdownList": null,
-        "Placement": [
-          "38cf4712-6e95-4ce1-b53a-bff03edad273"
-        ],
+        "Placement": [],
         "Position": 100,
         "ShowAtTheTop": false,
         "Size": "Large",
@@ -31,6 +29,7 @@
         "Position": 101,
         "ShowAtTheTop": false,
         "Size": "Large",
+        "Description": "<div id=\"BusinesCF\" style=\"display: none;\"><script>window.onload=()=>{const customFields=[{labelText:'Zatca Certificate Info'},{labelText:'Last ICV'},{labelText:'Last PIH'}];const vModelForm=document.getElementById('v-model-form');console.log('vModelForm:',vModelForm);if(vModelForm){customFields.forEach(field=>{const labels=vModelForm.querySelectorAll('label');labels.forEach(label=>{if(label.textContent.trim()===field.labelText){console.log('Found label:',field.labelText);const formGroup=label.closest('.form-group');if(formGroup){const inputs=formGroup.querySelectorAll('input,textarea');console.log('Found inputs:',inputs);inputs.forEach(input=>{input.readOnly=true;console.log('Set input to readOnly:',input);});}}});});}const selfDeletingContainer=document.getElementById('BusinesCF');if(selfDeletingContainer){selfDeletingContainer.remove();}};</script></div>",
         "Type": "ParagraphText"
       }
     },
@@ -43,7 +42,6 @@
         "Name": "Last ICV",
         "OptionsForDropdownList": null,
         "Placement": [
-          "5d6fae1e-ff34-4870-80e9-8a755842d46e",
           "38cf4712-6e95-4ce1-b53a-bff03edad273"
         ],
         "Position": 102,
@@ -61,7 +59,6 @@
         "Name": "Last PIH",
         "OptionsForDropdownList": null,
         "Placement": [
-          "5d6fae1e-ff34-4870-80e9-8a755842d46e",
           "38cf4712-6e95-4ce1-b53a-bff03edad273"
         ],
         "Position": 103,
@@ -374,6 +371,27 @@
         "ShowAtTheTop": false,
         "Size": "Medium",
         "Type": "DropdownList"
+      }
+    },
+    {
+      "apipath": "/text-custom-field-form",
+      "data": {
+        "Description": "<div id='DateCreated' style='display: none;'><script> document.addEventListener('DOMContentLoaded', () => { const FIELD_GUID = 'a1b2c3d4-e5f6-4abc-8def-abcdef000020'; const LABEL_TEXT = 'Date Created'; const dateInput = document.querySelector('.mx-input'); if (dateInput) { dateInput.disabled = true; const calendarIcon = document.querySelector('.mx-icon-calendar'); if (calendarIcon) { calendarIcon.style.pointerEvents = 'none'; calendarIcon.style.opacity = '0.5'; } } const checkbox = document.querySelector('.input-group-addon input[type=\\\"checkbox\\\"]'); const inputText = document.querySelector('.input-group input[type=\\\"text\\\"]'); if (checkbox && inputText) { app.AutomaticReference = false; checkbox.checked = false; checkbox.disabled = true; inputText.disabled = true; } const createButton = document.querySelector('button.btn.btn-primary[onclick=\\\"ajaxPost(true)\\\"]'); if (createButton && app?.CustomFields2?.Strings) { const now = new Date(); const localDatetime = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)); const currentDateTime = localDatetime.toISOString().slice(0, 19).replace('T', ' '); app.CustomFields2.Strings[FIELD_GUID] = currentDateTime; app.IssueDate = currentDateTime.slice(0, 10); if (checkbox && inputText) { app.AutomaticReference = true; checkbox.checked = true; checkbox.disabled = true; inputText.disabled = true; }} const vModelForm = document.getElementById('v-model-form'); if (vModelForm) { const labels = vModelForm.querySelectorAll('label'); labels.forEach(label => { if (label.textContent.trim() === LABEL_TEXT) { const formGroup = label.closest('.form-group'); if (formGroup) { formGroup.style.display = 'none'; } } }); } const selfDeletingContainer = document.getElementById('DateCreated'); if (selfDeletingContainer) { selfDeletingContainer.remove(); } }); </script></div>",
+        "DisplayOnView": false,
+        "Inactive": false,
+        "Key": "a1b2c3d4-e5f6-4abc-8def-abcdef000020",
+        "Name": "Date Created",
+        "OptionsForDropdownList": null,
+        "Placement": [
+          "ad12b60b-23bf-4421-94df-8be79cef533e",
+          "274fc6d0-2eac-43d0-8286-79c856e644aa",
+          "245e5943-0092-409d-96ae-e2ee10eac75b",
+          "58b9eb90-f6b8-4abc-8ea1-12fd77b8336e"
+        ],
+        "Position": 120,
+        "ShowAtTheTop": false,
+        "Size": "small",
+        "Type": "SingleLineText"
       }
     },
     {
