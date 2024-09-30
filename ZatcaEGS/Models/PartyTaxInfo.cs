@@ -2,6 +2,11 @@
 {
     public class PartyTaxInfo
     {
+        // If the tax exemption reason code (BT-121) is equal to VATEX-SA-EDU or VATEX-SA-HEA, then the other buyer ID (BT-46) is mandatory  and must be national ID (BT-46-1 = NAT)
+
+        //public string IdentificationScheme { get; set; } = "";
+        //public string IdentificationID { get; set; } = "";
+
         // Postal
         public string StreetName { get; set; } = "";
         public string BuildingNumber { get; set; } = "";

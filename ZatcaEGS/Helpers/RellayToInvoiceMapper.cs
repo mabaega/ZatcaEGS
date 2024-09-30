@@ -177,6 +177,15 @@ namespace ZatcaEGS.Helpers
             {
                 Party = new Party
                 {
+                    //PartyIdentification = new PartyIdentification
+                    //{
+                    //    ID = new ID
+                    //    {
+                    //        SchemeID = partyInfo.IdentificationScheme,
+                    //        Value = partyInfo.IdentificationID
+                    //    }
+                    //},
+
                     PostalAddress = new PostalAddress
                     {
                         StreetName = partyInfo.StreetName,
@@ -202,6 +211,7 @@ namespace ZatcaEGS.Helpers
                         RegistrationName = partyInfo.RegistrationName
                     }
                 }
+
             };
         }
 

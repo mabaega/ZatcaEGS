@@ -392,7 +392,7 @@
                 var $btn = $(this);
                 $btn.find('.fa-spinner').removeClass('hidden');
 
-                var formData = $('form').serialize();  // Serialize the entire form
+                var formData = $('form').serialize();
 
                 $.ajax({
                     url: '@Url.Action("AjaxComplianceCheck")',
@@ -401,19 +401,15 @@
                     success: function (response) {
                         var jsonResponse = JSON.parse(response.serverResult);
 
-                        // Format the JSON response and display it in the textarea
                         var formattedJson = JSON.stringify(jsonResponse, null, 4);  // Pretty-print JSON with 4 spaces
                         $('#textareaResponse').val(formattedJson);
 
-                        // Hide compliance check button
                         $btn.hide();
 
-                        // Create buttons dynamically based on the response
                         var clearanceStatus = jsonResponse.clearanceStatus;
                         var reportingStatus = jsonResponse.reportingStatus;
                         var invoiceSubType = response.invoiceSubType;
 
-                        // Show Reporting and Clearance buttons based on response
                         if (clearanceStatus === "CLEARED" || reportingStatus === "REPORTED") {
                             if (!invoiceSubType.startsWith("01")) {
                                 $('#buttonsContainer').append(
@@ -562,7 +558,6 @@
                 const sfileName = '@fileName';
 
                 if (sfileContent) {
-                    //downloadFile(message + sfileContent, sfileName);
                     downloadFile(sfileContent, sfileName);
                 }
             }

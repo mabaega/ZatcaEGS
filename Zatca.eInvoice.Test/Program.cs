@@ -414,7 +414,7 @@ public class ServerResult
 {
     [JsonProperty("requestType")]
     public string RequestType { get; set; }
-    
+
     [JsonProperty("requestUrl")]
     public string RequestUrl { get; set; }
 

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml.Serialization;
 using Zatca.eInvoice;
@@ -34,6 +35,26 @@ namespace ZatcaEGS.Controllers
                         Token = formData.GetValueOrDefault("Token"),
                     });
                 }
+
+                //Check Expired Certificate
+                try
+                {
+                    byte[] certificateBytes = Convert.FromBase64String(certInfo.PCSIDBinaryToken);
+                    X509Certificate2 cert = new X509Certificate2(certificateBytes);
+                    DateTime expirationDate = cert.NotAfter;
+                    Console.WriteLine($"Certificate Valid from : {cert.NotBefore} to {cert.NotAfter}");
+                    if (DateTime.Now > expirationDate)
+                    {
+                        //Goto Renewal Page
+                        Console.WriteLine("Sertifikat sudah kedaluwarsa.");
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+
 
                 bool hasTokenSecret = relayData.HasTokenSecret;
 

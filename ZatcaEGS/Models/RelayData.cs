@@ -88,6 +88,8 @@ namespace ZatcaEGS.Models
 
                 PartyInfo = new PartyTaxInfo()
                 {
+                    //IdentificationScheme = JsonParser.FindStringByGuid(InvoiceJson, ManagerCustomField.IdentificationScheme, "RefInvoice"),
+                    //IdentificationID = JsonParser.FindStringByGuid(InvoiceJson, ManagerCustomField.IdentificationID, "RefInvoice"),
                     StreetName = JsonParser.FindStringByGuid(InvoiceJson, ManagerCustomField.StreetName, "RefInvoice"),
                     BuildingNumber = JsonParser.FindStringByGuid(InvoiceJson, ManagerCustomField.BuildingNumber, "RefInvoice"),
                     CitySubdivisionName = JsonParser.FindStringByGuid(InvoiceJson, ManagerCustomField.CitySubdivisionName, "RefInvoice"),

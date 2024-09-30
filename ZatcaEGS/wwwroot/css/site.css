@@ -35,7 +35,7 @@ table.dataTable thead th {
 }
 
 .navbar {
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 .active > .page-link, .page-link.active {
@@ -50,7 +50,7 @@ main {
 }
 
     main > .container {
-        padding: 20px 15px 20px;
+        padding: 20px 15px 10px;
     }
 
 .form-label {

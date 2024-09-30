@@ -7,6 +7,11 @@
         public const string LastIcvGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000002";
         public const string LastPihGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000003";
 
+        // If the tax exemption reason code (BT-121) is equal to VATEX-SA-EDU or VATEX-SA-HEA, then the other buyer ID (BT-46) is mandatory  and must be national ID (BT-46-1 = NAT)
+
+        //public const string IdentificationScheme = "a1b2c3d4-e5f6-4abc-8def-abcdef000021";
+        //public const string IdentificationID = "a1b2c3d4-e5f6-4abc-8def-abcdef000022";
+
         public const string StreetName = "a1b2c3d4-e5f6-4abc-8def-abcdef000004";
         public const string BuildingNumber = "a1b2c3d4-e5f6-4abc-8def-abcdef000005";
         public const string CitySubdivisionName = "a1b2c3d4-e5f6-4abc-8def-abcdef000006";
@@ -25,6 +30,9 @@
         public const string QrCodeGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000018";
 
         public const string DateCreatedGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000020";
+
+
+
 
         public const string ItemTaxCategoryGuid = "a1b2c3d4-e5f6-4abc-8def-abcdef000019";
 

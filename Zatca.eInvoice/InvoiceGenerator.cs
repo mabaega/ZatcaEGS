@@ -94,8 +94,8 @@ namespace Zatca.eInvoice
 
                 if (InvoiceObject.InvoiceTypeCode.Name.StartsWith("02"))
                 {
-
-                    byte[] certificateBytes = Encoding.UTF8.GetBytes(X509CertificateContent);
+                    byte[] certificateBytes = Convert.FromBase64String(X509CertificateContent);
+                    //byte[] certificateBytes = Encoding.UTF8.GetBytes(X509CertificateContent); // not work in WSL
                     X509Certificate2 parsedCertificate = new(certificateBytes);
 
                     string SignatureTimestamp = DateTime.Now.ToString("yyyy-MM-dd'T'HH:mm:ss");
@@ -135,6 +135,7 @@ namespace Zatca.eInvoice
 
                 }
 
+                CleanInvoice = CleanInvoice.Replace("\r\n", "\n");
                 byte[] bytes = Encoding.UTF8.GetBytes(CleanInvoice);
                 base64SignedInvoice = Convert.ToBase64String(bytes);
 
