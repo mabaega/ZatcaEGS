@@ -10,8 +10,8 @@
     <ServerGarbageCollection>false</ServerGarbageCollection>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>24.09.30.0001</AssemblyVersion>
-    <FileVersion>24.09.30.0001</FileVersion>
+    <AssemblyVersion>24.10.01.0001</AssemblyVersion>
+    <FileVersion>24.10.01.0001</FileVersion>
     <UserSecretsId>213d5a12-e059-458b-975f-6ea7605cf393</UserSecretsId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

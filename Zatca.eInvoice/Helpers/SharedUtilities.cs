@@ -133,7 +133,7 @@ namespace Zatca.eInvoice.Helpers
             return SHA256.HashData(Encoding.UTF8.GetBytes(rawData));
         }
 
-        //https://zatca1.discourse.group/t/signed-and-reported-b2c-xmls-not-validated-with-web-based-validator/1376/3?u=ecloud
+        // https://zatca1.discourse.group/t/signed-and-reported-b2c-xmls-not-validated-with-web-based-validator/1376/3?u=ecloud
         internal static string GetDigitalSignature(string xmlHashing, string privateKeyContent)
         {
             byte[] buffer;

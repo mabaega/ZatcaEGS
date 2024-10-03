@@ -88,6 +88,8 @@ namespace Zatca.eInvoice
             try
             {
                 string CleanInvoice = GetCleanInvoiceXML(true);
+                CleanInvoice = CleanInvoice.Replace("\r\n", "\n");
+                CleanInvoice = CleanInvoice.Replace("\n", "\r\n");
                 InvoiceHash = SharedUtilities.GetBase64InvoiceHash(CleanInvoice);
 
                 base64QrCode = "";
@@ -99,11 +101,13 @@ namespace Zatca.eInvoice
                     X509Certificate2 parsedCertificate = new(certificateBytes);
 
                     string SignatureTimestamp = DateTime.Now.ToString("yyyy-MM-dd'T'HH:mm:ss");
+                    //string PublicKeyHashing = Convert.ToBase64String(SharedUtilities.HashSha256(X509CertificateContent));
                     string PublicKeyHashing = Convert.ToBase64String(Encoding.UTF8.GetBytes(SharedUtilities.HashSha256AsString(X509CertificateContent)));
                     string IssuerName = parsedCertificate.IssuerName.Name;
                     string SerialNumber = SharedUtilities.GetSerialNumberForCertificateObject(parsedCertificate);
                     string SignedPropertiesHash = SharedUtilities.GetSignedPropertiesHash(SignatureTimestamp, PublicKeyHashing, IssuerName, SerialNumber);
 
+                    Console.WriteLine($"{IssuerName} - {SerialNumber} - {SignedPropertiesHash}");
 
                     string SignatureValue = SharedUtilities.GetDigitalSignature(InvoiceHash, EcSecp256k1Privkeypem);
 
@@ -135,7 +139,6 @@ namespace Zatca.eInvoice
 
                 }
 
-                CleanInvoice = CleanInvoice.Replace("\r\n", "\n");
                 byte[] bytes = Encoding.UTF8.GetBytes(CleanInvoice);
                 base64SignedInvoice = Convert.ToBase64String(bytes);
 
